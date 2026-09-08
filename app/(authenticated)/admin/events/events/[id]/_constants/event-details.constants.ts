@@ -14,6 +14,7 @@ export const TICKET_TYPE_CONFIG: Record<TicketType, { label: string; color: stri
   GENERAL: { label: 'General', color: 'text-sky-600 dark:text-sky-400' },
   TABLE: { label: 'Table', color: 'text-sky-600 dark:text-sky-400' },
   SPONSORSHIP: { label: 'Sponsorship', color: 'text-sky-600 dark:text-sky-400' },
+  DEPOSIT: { label: 'Deposit', color: 'text-indigo-600 dark:text-sky-400' },
 
   // Bought alongside a seat, admits nobody on its own
   RAFFLE: { label: 'Raffle', color: 'text-amber-600 dark:text-amber-400' },

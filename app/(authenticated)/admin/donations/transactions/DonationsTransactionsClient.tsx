@@ -6,7 +6,7 @@ import { formatCurrency } from '@/lib/utils/currency.utils'
 import { DonationWithRelations } from '../_types/donation.types'
 import DonationsTransactionOrderRow from './_components/DonationsTransactionOrderRow'
 import { AdminPageHeader } from '@/app/(authenticated)/admin/_components/AdminPageHeader'
-import { DonationDrawer } from '../_components/DonationDrawer'
+import { DonationDrawer } from './_components/DonationDrawer'
 
 type FrequencyFilter = 'all' | 'one_time' | 'monthly' | 'yearly'
 

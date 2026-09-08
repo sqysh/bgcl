@@ -54,6 +54,7 @@ export function LeftSidebar({
               <FormSwitch name="isPublic" label="Public" />
               <FormSwitch name="isRaffle" label="Raffle" />
               <FormSwitch name="showAttendingToggle" label="Attending" />
+              <FormSwitch name="isListed" label="Listed" />
             </div>
           </div>
         </div>

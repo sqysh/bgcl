@@ -7,7 +7,7 @@ import { formatCurrency, formatCurrencyWhole } from '@/lib/utils/currency.utils'
 import { useFailedPaymentDrawer } from '@/stores/drawers'
 import { usePreferencesStore } from '@/stores/usePreferencesStore'
 import { AdminPageHeader } from '@/app/(authenticated)/admin/_components/AdminPageHeader'
-import { FailedPaymentsDrawer } from '@/components/drawers/FailedPaymentDrawer'
+import { FailedPaymentsDrawer } from '@/app/(authenticated)/admin/donations/overview/_components/FailedPaymentDrawer'
 import { ExportReportButton } from './_components/ExportReportButton'
 
 const labelCls = 'text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400 dark:text-neutral-600'

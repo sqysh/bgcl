@@ -1,19 +1,14 @@
-import { DecimalToNumber } from '@/types/prisma.types'
 import { Prisma } from '@prisma/client'
 
-/**
- * Walks any Prisma result and turns every Decimal into a number so it can
- * cross to the client. Handles nested relations and arrays; leaves Dates alone.
- */
-export function serialize<T>(value: T): DecimalToNumber<T> {
-  if (value == null) return value as never
-  if (value instanceof Prisma.Decimal) return Number(value) as never
-  if (value instanceof Date) return value as never
-  if (Array.isArray(value)) return value.map(serialize) as never
+export function serialize<T>(value: T, isoDates = false): any {
+  if (value == null) return value
+  if (value instanceof Prisma.Decimal) return Number(value)
+  if (value instanceof Date) return isoDates ? value.toISOString() : value
+  if (Array.isArray(value)) return value.map((item) => serialize(item, isoDates))
 
   if (typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value as Record<string, unknown>).map(([k, v]) => [k, serialize(v)])) as never
+    return Object.fromEntries(Object.entries(value as Record<string, unknown>).map(([k, v]) => [k, serialize(v, isoDates)]))
   }
 
-  return value as never
+  return value
 }

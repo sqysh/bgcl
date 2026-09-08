@@ -196,6 +196,7 @@ model Event {
   showTicketMarquee       Boolean @default(true)
   showRaffleTicketNumbers Boolean @default(false)
   showAttendingToggle     Boolean @default(false)
+  isListed                Boolean @default(false)
 
   // deprecated
   featured Boolean @default(false)
@@ -865,6 +866,7 @@ enum TicketType {
   TOURNAMENT
   SPONSORSHIP
   AD
+  DEPOSIT
 }
 
 enum AddressType {

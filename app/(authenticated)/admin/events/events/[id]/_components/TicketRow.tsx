@@ -42,9 +42,7 @@ export function TicketRow({
               placeholder="Ticket name"
               className="flex-1 min-w-0 bg-transparent text-sm font-semibold text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none border-b border-transparent focus:border-neutral-300 dark:focus:border-neutral-600 transition-colors py-0.5"
             />
-            <span className={`text-[10px] font-bold uppercase tracking-wider shrink-0 ${typeCfg.color}`}>
-              {typeCfg.label}
-            </span>
+            <span className={`text-[10px] font-bold uppercase tracking-wider shrink-0 ${typeCfg.color}`}>{typeCfg.label}</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
             <span className="font-medium">${Number(ticket.price ?? 0).toFixed(2)}</span>
@@ -148,6 +146,7 @@ export function TicketRow({
                   className={inputCls}
                 >
                   <option value="AD">Ad</option>
+                  <option value="DEPOSIT">Deposit</option>
                   <option value="GENERAL">General</option>
                   <option value="RAFFLE">Raffle</option>
                   <option value="TABLE">Table</option>
@@ -165,11 +164,7 @@ export function TicketRow({
                   />
                 )}
 
-                <CustomSwitch
-                  checked={!!ticket.isPublished}
-                  onChange={(v) => onUpdate('isPublished', v)}
-                  label="Published"
-                />
+                <CustomSwitch checked={!!ticket.isPublished} onChange={(v) => onUpdate('isPublished', v)} label="Published" />
               </div>
 
               {/* Description */}

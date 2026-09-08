@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Menu, ShoppingCart, X } from 'lucide-react'
+import { Loader2, Menu, ShoppingCart, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -11,6 +11,7 @@ import { usePreferencesStore } from '@/stores/usePreferencesStore'
 import { useNavigationStore } from '@/stores/useNavigationStore'
 import { useCartStore } from '@/stores/useCartStore'
 import type { Role } from '@prisma/client'
+import { useTransition } from 'react'
 
 const ADMIN_ROLES: Role[] = ['ADMIN', 'SUPERUSER', 'STAFF']
 
@@ -23,6 +24,27 @@ export function getAccountHref(role?: Role | null) {
   return '/supporter/overview'
 }
 
+const getVisibilityClass = (priority: number) => {
+  switch (priority) {
+    case 1:
+      return 'hidden lg:block' // always visible in nav range
+    case 2:
+      return 'hidden lg-2:block' // visible from 1100px
+    case 3:
+      return 'hidden lg-3:block' // visible from 1160px
+    case 4:
+      return 'hidden xl:block' // visible from 1280px
+    case 5:
+      return 'hidden 1xl:block' // visible from 1336px
+    case 6:
+      return 'hidden xl-2:block' // visible from 1380px
+    case 7:
+      return 'hidden 2xl:block' // visible from 1536px — first to disappear
+    default:
+      return 'hidden lg:block'
+  }
+}
+
 export default function Header() {
   const { data, status } = useSession()
   const pathname = usePathname()
@@ -33,38 +55,7 @@ export default function Header() {
   const isSpanish = usePreferencesStore((s) => s.isSpanish)
   const role = data?.user?.role
   const isAdmin = role === 'ADMIN' || role === 'SUPERUSER'
-
-  const getLaunchPath = () => {
-    if (status !== 'authenticated') return '/auth/login'
-    return ['ADMIN', 'SUPERUSER'].includes(data?.user?.role ?? '')
-      ? '/admin/dashboard'
-      : data?.user?.role === 'PROGRAM'
-        ? '/admin/job-applications'
-        : '/supporter/overview'
-  }
-
-  const handleLaunchApp = () => router.push(getLaunchPath())
-
-  const getVisibilityClass = (priority: number) => {
-    switch (priority) {
-      case 1:
-        return 'hidden lg:block' // always visible in nav range
-      case 2:
-        return 'hidden lg-2:block' // visible from 1100px
-      case 3:
-        return 'hidden lg-3:block' // visible from 1160px
-      case 4:
-        return 'hidden xl:block' // visible from 1280px
-      case 5:
-        return 'hidden 1xl:block' // visible from 1336px
-      case 6:
-        return 'hidden xl-2:block' // visible from 1380px
-      case 7:
-        return 'hidden 2xl:block' // visible from 1536px — first to disappear
-      default:
-        return 'hidden lg:block'
-    }
-  }
+  const [isPending, startTransition] = useTransition()
 
   return (
     <>
@@ -118,13 +109,18 @@ export default function Header() {
                 </span>
               )}
             </Link>
+
             {status === 'authenticated' ? (
-              <Link
-                href={getAccountHref(role)}
-                className="dark:text-neutral-300 dark:hover:text-white text-neutral-700 hover:text-neutral-900 text-sm font-medium transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
+              <button
+                type="button"
+                onClick={() => startTransition(() => router.push(getAccountHref(role)))}
+                disabled={isPending}
+                aria-busy={isPending}
+                className="inline-flex items-center gap-1.5 dark:text-neutral-300 dark:hover:text-white text-neutral-700 hover:text-neutral-900 text-sm font-medium transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
               >
+                {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden="true" />}
                 {isAdmin ? 'Dashboard' : 'My Account'}
-              </Link>
+              </button>
             ) : (
               <Link
                 href="/auth/login"

@@ -10,6 +10,8 @@ const STATUS_DOT: Record<string, string> = {
 
   UPCOMING: 'bg-sky-500',
   ONGOING: 'bg-emerald-500',
+  POSTPONED: 'bg-amber-500',
+  ARCHIVED: 'bg-neutral-300 dark:bg-neutral-700',
   DRAFT: 'bg-neutral-300 dark:bg-neutral-700'
 }
 
@@ -20,12 +22,17 @@ const label = (status: string) =>
     .join(' ')
     .replace(/^./, (c) => c.toUpperCase())
 
-export const StatusBadge = ({ status }: { status: string }) => (
-  <span className="inline-flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400 whitespace-nowrap">
-    <span
-      className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_DOT[status] ?? 'bg-neutral-300 dark:bg-neutral-700'}`}
-      aria-hidden="true"
-    />
-    {label(status)}
-  </span>
-)
+/** Renders nothing without a status, since a new event has none yet */
+export const StatusBadge = ({ status }: { status?: string | null }) => {
+  if (!status) return null
+
+  return (
+    <span className="inline-flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400 whitespace-nowrap">
+      <span
+        className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_DOT[status] ?? 'bg-neutral-300 dark:bg-neutral-700'}`}
+        aria-hidden="true"
+      />
+      {label(status)}
+    </span>
+  )
+}

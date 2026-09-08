@@ -1,18 +1,26 @@
+'use client'
+
 import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Picture from '@/components/_shared/Picture'
 import { ArrowLeft, User } from 'lucide-react'
+import { useCartStore } from '@/stores/useCartStore'
 
 export function TicketCheckoutHeader() {
   const session = useSession()
+  const items = useCartStore((s) => s.items)
 
-  const backHref = '/cart'
-  const backLabel = 'Back to cart'
+  // A deposit cart came from the reservation page, not the cart page, so back
+  // should return where they started
+  const isReservation = items.some((item) => item.ticketType === 'DEPOSIT')
+
+  const backHref = isReservation ? '/reserve' : '/cart'
+  const backLabel = isReservation ? 'Back' : 'Back to cart'
 
   return (
-    <div className="px-4 sm:px-6 md:px-12 py-4 border-b border-neutral-200 dark:border-neutral-800">
-      <div className="max-w-4xl mx-auto">
+    <div className="border-b border-neutral-200 dark:border-neutral-800">
+      <div className="max-w-4xl w-full mx-auto px-6 lg:px-8 py-4">
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -49,20 +57,24 @@ export function TicketCheckoutHeader() {
               <span className="hidden sm:inline">{backLabel}</span>
             </Link>
 
-            {session?.data?.user && (
-              <Link
-                href="/supporter/overview"
-                className="flex items-center gap-2 min-w-0 group"
-                title={session.data.user.email ?? undefined}
-              >
-                <div className="w-7 h-7 rounded-full bg-sky-500/10 dark:bg-sky-500/20 flex items-center justify-center shrink-0 group-hover:bg-sky-500/20 dark:group-hover:bg-sky-500/30 transition-colors">
-                  <User className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" aria-hidden="true" />
-                </div>
-                <span className="text-sm text-neutral-600 dark:text-neutral-400 truncate hidden md:inline max-w-40">
-                  {session.data.user.email}
+            {session?.data?.user &&
+              (isReservation ? (
+                <span className="flex items-center gap-2 min-w-0" title={session.data.user.email ?? undefined}>
+                  <span className="text-sm text-neutral-600 dark:text-neutral-400 truncate hidden md:inline max-w-46">
+                    {session.data.user.email}
+                  </span>
                 </span>
-              </Link>
-            )}
+              ) : (
+                <Link
+                  href="/supporter/overview"
+                  className="flex items-center gap-2 min-w-0 group"
+                  title={session.data.user.email ?? undefined}
+                >
+                  <span className="text-sm text-neutral-600 dark:text-neutral-400 truncate hidden md:inline max-w-46">
+                    {session.data.user.email}
+                  </span>
+                </Link>
+              ))}
           </div>
         </motion.div>
       </div>

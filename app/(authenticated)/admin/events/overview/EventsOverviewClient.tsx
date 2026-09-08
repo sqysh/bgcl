@@ -6,9 +6,9 @@ import { motion } from 'framer-motion'
 import { Calendar, DollarSign, Ticket, Users, Megaphone } from 'lucide-react'
 import { CheckCircle } from 'lucide-react'
 import { SaleWindowBadge } from './_components/SalesWindowBadge'
-import { colorMap, COLORS } from './_events-overview.constants'
+import { colorMap, COLORS } from './_constants/events-overview.constants'
 import { AdminPageHeader } from '../../_components/AdminPageHeader'
-import { ExportEventsButton } from '../_components/ExportEventsButton'
+import { ExportEventsButton } from './_components/ExportEventsButton'
 
 const iconClasses = (color) =>
   colorMap[color]

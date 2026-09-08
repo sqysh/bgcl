@@ -1,6 +1,6 @@
 'use client'
 
-import { badgeTone } from '../_events-overview.constants'
+import { badgeTone } from '../_constants/events-overview.constants'
 
 const saleDateFormat = new Intl.DateTimeFormat('en-US', {
   month: 'short',

@@ -36,6 +36,7 @@ interface CartLine {
 }
 
 const MIN_AMOUNT_CENTS = 500
+const MAX_DEPOSITS_PER_PERSON = 2
 
 const parseTickets = (tickets: string): CartLine[] => {
   try {
@@ -90,7 +91,7 @@ export async function createPaymentIntentForTicketCheckout({
       }),
       prisma.ticket.findMany({
         where: { id: { in: lines.map((l) => l.ticketId) }, eventId },
-        select: { id: true, name: true, price: true, totalQuantity: true, quantitySold: true }
+        select: { id: true, name: true, price: true, ticketType: true, totalQuantity: true, quantitySold: true }
       })
     ])
 
@@ -146,6 +147,36 @@ export async function createPaymentIntentForTicketCheckout({
         feeCents
       })
       return { success: false, data: null, error: 'Your total has changed. Refresh the page and try again.' }
+    }
+
+    // Two tables per person, counted across every order they have already
+    // placed rather than just this one
+    const depositLines = lines.filter((line) => ticketRows.find((t) => t.id === line.ticketId)?.ticketType === 'DEPOSIT')
+
+    if (depositLines.length > 0) {
+      const previous = await prisma.orderItem.findMany({
+        where: {
+          ticketId: { in: depositLines.map((line) => line.ticketId) },
+          order: { userId, status: 'CONFIRMED' }
+        },
+        select: { quantity: true }
+      })
+
+      const alreadyHeld = previous.reduce((sum, item) => sum + item.quantity, 0)
+      const requested = depositLines.reduce((sum, line) => sum + line.quantity, 0)
+
+      if (alreadyHeld + requested > MAX_DEPOSITS_PER_PERSON) {
+        await createLog('warn', 'Deposit limit exceeded', { userId, alreadyHeld, requested })
+
+        return {
+          success: false,
+          data: null,
+          error:
+            alreadyHeld > 0
+              ? `You already have ${alreadyHeld} ${alreadyHeld === 1 ? 'table' : 'tables'}. Two per person is the maximum.`
+              : 'Two tables per person is the maximum.'
+        }
+      }
     }
 
     const customerId = await getOrCreateStripeCustomer(userId)

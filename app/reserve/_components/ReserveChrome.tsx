@@ -1,11 +1,35 @@
-import Link from 'next/link'
-import { Lock } from 'lucide-react'
+'use client'
+
+import Picture from '@/components/_shared/Picture'
 import { useEffect, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 
 const CONTACT_EMAIL = 'info@bgcl.org'
 
-export function TicketCheckoutFooter() {
+export function ReserveHeader() {
+  return (
+    <header className="shrink-0 border-b border-neutral-200 dark:border-neutral-800">
+      <div className="max-w-lg mx-auto px-6 py-3 flex items-center justify-between gap-4">
+        <div className="flex h-8 shrink-0" aria-label="Boys &amp; Girls Club of Lynn">
+          <Picture
+            src="/images/horizontal-logo-light.png"
+            alt="Boys &amp; Girls Club of Lynn"
+            className="dark:hidden block h-full w-auto object-contain hover:opacity-80 transition-opacity"
+            priority
+          />
+          <Picture
+            src="/images/horizontal-logo-dark.png"
+            decorative
+            className="dark:block hidden h-full w-auto object-contain hover:opacity-80 transition-opacity"
+            priority
+          />
+        </div>
+      </div>
+    </header>
+  )
+}
+
+export function ReserveFooter() {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -25,8 +49,8 @@ export function TicketCheckoutFooter() {
   }
 
   return (
-    <div className="border-t border-neutral-200 dark:border-neutral-800 mt-auto">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-12 py-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+    <footer className="shrink-0 border-t border-neutral-200 dark:border-neutral-800 mt-auto">
+      <div className="max-w-lg mx-auto px-6 py-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <p className="text-xs text-neutral-400 dark:text-neutral-600">
           Questions?{' '}
           <button
@@ -54,6 +78,6 @@ export function TicketCheckoutFooter() {
           </a>
         </p>
       </div>
-    </div>
+    </footer>
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Archive, ArchiveRestore, Edit2, ExternalLink, GripVertical, Trash2 } from 'lucide-react'
+import { useState, useTransition } from 'react'
+import { Archive, ArchiveRestore, Edit2, ExternalLink, GripVertical, Loader2, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 import { deleteCampaign } from '@/lib/actions/campaign/deleteCampaign'
@@ -27,6 +27,37 @@ import {
 
 type ItemType = 'program' | 'news' | 'newsletter' | 'resource' | 'campaign' | 'closing' | 'event' | 'partner'
 
+const dateTime = (value: Date) =>
+  value.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: 'America/New_York'
+  })
+
+/** Spelled out, because getting a sales window wrong is expensive */
+function getSaleNote(item: any): { label: string; tone: string } {
+  const opens = item.ticketSalesStartDate ? new Date(item.ticketSalesStartDate) : null
+  const closes = item.ticketSalesEndDate ? new Date(item.ticketSalesEndDate) : null
+  const now = Date.now()
+
+  if (!opens && !closes) return { label: 'No sales window set', tone: 'text-amber-600 dark:text-amber-500' }
+
+  if (opens && now < opens.getTime()) {
+    return { label: `Sales open ${dateTime(opens)}`, tone: 'text-neutral-400 dark:text-neutral-600' }
+  }
+
+  if (closes && now > closes.getTime()) {
+    return { label: `Sales closed ${dateTime(closes)}`, tone: 'text-neutral-400 dark:text-neutral-600' }
+  }
+
+  return {
+    label: closes ? `On sale until ${dateTime(closes)}` : 'On sale, no close date',
+    tone: 'text-emerald-600 dark:text-emerald-500'
+  }
+}
+
 /**
  * One entry per entity: how to delete it, how to open its edit drawer, and
  * (optionally) where its public page lives. Adding an entity means adding a
@@ -37,7 +68,7 @@ const ITEM_CONFIG: Record<
   {
     delete: (id: string) => Promise<unknown>
     openDrawer: (item: any) => void
-    publicPath?: (id: string) => string
+    publicPath?: (id: string, isListed?: boolean) => string
   }
 > = {
   program: {
@@ -72,7 +103,7 @@ const ITEM_CONFIG: Record<
   event: {
     delete: async () => {}, // events archive rather than delete
     openDrawer: (item) => useEventDrawer.getState().open(item),
-    publicPath: (id) => `/events/${id}`
+    publicPath: (id, isListed) => (isListed ? '/reserve' : `/events/${id}`)
   }
 }
 
@@ -95,8 +126,8 @@ function getSubtitle(item: any): string {
     item.paragraph1 ||
     item.year ||
     item.url ||
-    item.description ||
     (item.date ? new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null) ||
+    item.description ||
     item.tier ||
     'No description'
   )
@@ -130,27 +161,33 @@ export default function AdminListItem({
   onError
 }: AdminListItemProps) {
   const router = useRouter()
-  const [isBusy, setIsBusy] = useState(false)
+  const [pending, setPending] = useState<'delete' | 'archive' | null>(null)
+  const [isNavigating, startTransition] = useTransition()
+
+  // Any running action disables the others, but only the one that is running
+  // shows a spinner
+  const isBusy = pending !== null || isNavigating
 
   const config = ITEM_CONFIG[itemType]
   const isEvent = itemType === 'event'
   const isArchived = item.status === 'ARCHIVED'
 
   const handleDelete = async () => {
-    setIsBusy(true)
+    setPending('delete')
+
     try {
       await config.delete(item.id)
       router.refresh()
     } catch {
       onError?.(`Failed to delete ${itemType}`)
     } finally {
-      setIsBusy(false)
+      setPending(null)
     }
   }
 
   const handleEdit = () => {
     if (isEvent) {
-      router.push(`/admin/events/events/${item.id}`)
+      startTransition(() => router.push(`/admin/events/events/${item.id}`))
       return
     }
 
@@ -158,14 +195,15 @@ export default function AdminListItem({
   }
 
   const handleArchive = async () => {
-    setIsBusy(true)
+    setPending('archive')
+
     try {
       await (isArchived ? unarchiveEvent(item.id) : archiveEvent(item.id))
       router.refresh()
     } catch {
       onError?.(`Failed to ${isArchived ? 'unarchive' : 'archive'} event`)
     } finally {
-      setIsBusy(false)
+      setPending(null)
     }
   }
 
@@ -176,6 +214,9 @@ export default function AdminListItem({
         ? 'border-t-2 border-t-sky-500'
         : 'border-b-2 border-b-sky-500'
       : 'border-b border-neutral-100 dark:border-neutral-900'
+
+  const ticketCount = item.tickets?.length ?? 0
+  const visibility = item.isPublic ? 'Public' : item.isListed ? 'Live, not on events' : 'Private'
 
   return (
     <div
@@ -206,21 +247,40 @@ export default function AdminListItem({
         <p className="mt-0.5 text-xs text-neutral-400 dark:text-neutral-600 truncate">{getSubtitle(item)}</p>
       </div>
 
-      {isEvent && item.status && (
-        <span className="shrink-0 hidden sm:inline-flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400 whitespace-nowrap">
-          <span
-            className={`w-1.5 h-1.5 rounded-full shrink-0 ${EVENT_STATUS_DOT[item.status] ?? 'bg-neutral-300 dark:bg-neutral-700'}`}
-            aria-hidden="true"
-          />
-          {item.status.toLowerCase().replace(/_/g, ' ')}
-        </span>
+      {isEvent && (
+        <div className="shrink-0 hidden sm:block text-right space-y-0.5">
+          <div className="flex items-center justify-end gap-2">
+            {item.status && (
+              <span className="inline-flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400 whitespace-nowrap">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full shrink-0 ${EVENT_STATUS_DOT[item.status] ?? 'bg-neutral-300 dark:bg-neutral-700'}`}
+                  aria-hidden="true"
+                />
+                {item.status.toLowerCase().replace(/_/g, ' ')}
+              </span>
+            )}
+
+            <span
+              className={`text-xs whitespace-nowrap ${
+                item.isPublic && item.isListed ? 'text-neutral-400 dark:text-neutral-600' : 'text-amber-600 dark:text-amber-500'
+              }`}
+            >
+              {visibility}
+            </span>
+            <span className="text-xs text-neutral-400 dark:text-neutral-600 whitespace-nowrap tabular-nums">
+              {ticketCount} {ticketCount === 1 ? 'ticket type' : 'ticket types'}
+            </span>
+          </div>
+
+          <p className={`text-[11px] whitespace-nowrap ${getSaleNote(item).tone}`}>{getSaleNote(item).label}</p>
+        </div>
       )}
 
       {/* Actions, revealed on hover but always reachable by keyboard */}
       <div className="shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
         {config.publicPath && (
           <a
-            href={config.publicPath(item.id)}
+            href={config.publicPath(item.id, item.isListed)}
             target="_blank"
             rel="noopener noreferrer"
             className={actionCls}
@@ -230,8 +290,19 @@ export default function AdminListItem({
           </a>
         )}
 
-        <button type="button" onClick={handleEdit} disabled={isBusy} className={actionCls} aria-label={`Edit ${itemType}`}>
-          <Edit2 className="h-3.5 w-3.5" aria-hidden="true" />
+        <button
+          type="button"
+          onClick={handleEdit}
+          disabled={isBusy}
+          aria-busy={isNavigating}
+          className={actionCls}
+          aria-label={`Edit ${itemType}`}
+        >
+          {isNavigating ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+          ) : (
+            <Edit2 className="h-3.5 w-3.5" aria-hidden="true" />
+          )}
         </button>
 
         {isEvent ? (
@@ -239,10 +310,13 @@ export default function AdminListItem({
             type="button"
             onClick={handleArchive}
             disabled={isBusy}
+            aria-busy={pending === 'archive'}
             className={actionCls}
             aria-label={isArchived ? 'Unarchive event' : 'Archive event'}
           >
-            {isArchived ? (
+            {pending === 'archive' ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            ) : isArchived ? (
               <ArchiveRestore className="h-3.5 w-3.5" aria-hidden="true" />
             ) : (
               <Archive className="h-3.5 w-3.5" aria-hidden="true" />
@@ -253,10 +327,15 @@ export default function AdminListItem({
             type="button"
             onClick={handleDelete}
             disabled={isBusy}
+            aria-busy={pending === 'delete'}
             className={`${actionCls} hover:text-red-600 dark:hover:text-red-400`}
             aria-label={`Delete ${itemType}`}
           >
-            <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+            {pending === 'delete' ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            ) : (
+              <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+            )}
           </button>
         )}
       </div>

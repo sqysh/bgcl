@@ -32,7 +32,7 @@ export const eventSchema = z.object({
   // Details
   title: z.string().trim().min(1, { error: 'Please enter a title' }),
   description: z.string().trim().nullish(),
-  host: z.string().trim().nullish(),
+  host: z.string().trim().nullish().default('The Boys & Girls Club of Lynn'),
   dresscode: z.string().trim().nullish(),
   requirements: z.string().trim().nullish(),
   materials: z.string().trim().nullish(),
@@ -89,7 +89,8 @@ export const eventSchema = z.object({
   // Display toggles
   showTicketMarquee: z.boolean().default(true),
   showRaffleTicketNumbers: z.boolean().default(false),
-  showAttendingToggle: z.boolean().default(false)
+  showAttendingToggle: z.boolean().default(false),
+  isListed: z.boolean().default(false)
 })
 
 export type EventFormInput = z.input<typeof eventSchema>
@@ -126,13 +127,14 @@ export const EMPTY_EVENT: EventFormInput = {
   maxAttendees: undefined,
 
   // Details
-  host: '',
+  host: 'The Boys & Girls Club of Lynn',
   tagline: '',
   subtitle: '',
-  missionStatement: '',
-  website: '',
+  missionStatement:
+    'To inspire and enable all young people, especially those that need us the most, to realize their full potential as productive responsible and caring citizens!',
+  website: 'https://bgcl.org',
   requirements: '',
-  materials: '',
+  materials: 'Business Cards',
   registrationUrl: '',
   meetingUrl: '',
 
@@ -160,5 +162,6 @@ export const EMPTY_EVENT: EventFormInput = {
   rafflePrizes: [],
   raffleSchedule: [],
   showRaffleTicketNumbers: false,
-  showAttendingToggle: false
+  showAttendingToggle: false,
+  isListed: false
 }
