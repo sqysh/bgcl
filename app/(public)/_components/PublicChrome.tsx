@@ -18,9 +18,10 @@ interface Props {
   capitalPage: Page | null
   donations: { id: string; customerName: string; createdAt: string }[]
   hero: IHero | null
+  capitalCampaign: { goalAmount: number; raisedAmount: number }
 }
 
-export default function PublicChrome({ children, capitalPage, donations, hero }: Props) {
+export default function PublicChrome({ children, capitalPage, donations, hero, capitalCampaign }: Props) {
   const pathname = usePathname()
   const showChrome = !HIDDEN_PATHS.some((path) => pathname.startsWith(path))
 
@@ -31,7 +32,7 @@ export default function PublicChrome({ children, capitalPage, donations, hero }:
       {showChrome && (
         <>
           <DonationNotification donations={donations} />
-          <CapitalCampaignTab pageData={capitalPage} />
+          <CapitalCampaignTab pageData={capitalPage} capitalCampaign={capitalCampaign} />
 
           <MobileNavigationDrawer />
 

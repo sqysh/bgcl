@@ -8,16 +8,20 @@ import { adminNavigationLinkData } from '@/app/(authenticated)/admin/_utils/admi
 import { getCurrentPageId } from '@/lib/utils/getCurrentPageId'
 import { useSidebarStore } from '@/stores/useSidebarStore'
 import AdminSidebar from './sidebar'
-import { Role } from '@prisma/client'
+import { Role, User } from '@prisma/client'
 
 export default function AdminLayoutClient({
   children,
   user,
-  isModalEnabled
+  isModalEnabled,
+  campaign,
+  users
 }: {
   children: ReactNode
   user: { role: Role; firstName?: string | null; lastName?: string | null; email?: string | null }
   isModalEnabled: boolean
+  campaign: { goalAmount: number; raisedAmount: number }
+  users: User[]
 }) {
   const pathname = usePathname()
   const navigationGroups = adminNavigationLinkData(pathname, user.role)
@@ -48,7 +52,7 @@ export default function AdminLayoutClient({
 
             {/* ── Desktop sidebar ── */}
             <div className="hidden lg:block fixed left-0 top-0 h-screen w-64 z-20">
-              <AdminSidebar user={user} isModalEnabled={isModalEnabled} />
+              <AdminSidebar user={user} isModalEnabled={isModalEnabled} campaign={campaign} users={users} />
             </div>
 
             {/* ── Mobile sidebar ── */}
@@ -58,7 +62,7 @@ export default function AdminLayoutClient({
               transition={{ duration: 0.3 }}
               className="fixed lg:hidden inset-y-0 left-0 z-50 w-64"
             >
-              <AdminSidebar user={user} isModalEnabled={isModalEnabled} />
+              <AdminSidebar user={user} isModalEnabled={isModalEnabled} campaign={campaign} users={users} />
             </motion.div>
           </>
         )}

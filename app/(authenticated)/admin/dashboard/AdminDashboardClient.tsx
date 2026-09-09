@@ -4,6 +4,8 @@ import { DashboardStats } from '@/lib/actions/_dashboard/getDashboardStats'
 import { motion } from 'framer-motion'
 import { AdminPageHeader } from '@/app/(authenticated)/admin/_components/AdminPageHeader'
 import { formatCurrency, formatCurrencyWhole } from '@/lib/utils/currency.utils'
+import { PendingStaffInvites } from './_components/PendingStaffInvites'
+import { useRouter } from 'next/navigation'
 
 const ORDER_TYPE_LABEL: Record<string, string> = {
   TICKET_PURCHASE: 'Ticket',
@@ -20,6 +22,7 @@ const STATUS_DOT: Record<string, string> = {
 }
 
 export default function AdminDashboardClient({ stats }: { stats: DashboardStats }) {
+  const router = useRouter()
   const monthDelta = stats.revenueThisMonth - stats.revenueLastMonth
   const monthDeltaPct = stats.revenueLastMonth > 0 ? ((monthDelta / stats.revenueLastMonth) * 100).toFixed(1) : null
   const monthUp = monthDelta >= 0
@@ -158,6 +161,8 @@ export default function AdminDashboardClient({ stats }: { stats: DashboardStats 
             )
           })()}
         </motion.section>
+
+        <PendingStaffInvites invites={stats.invites} onRevoked={() => router.refresh()} />
 
         <motion.section
           initial={{ opacity: 0, y: 8 }}

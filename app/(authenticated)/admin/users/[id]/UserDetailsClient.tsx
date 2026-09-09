@@ -1,4 +1,3 @@
-// app/(authenticated)/admin/users/[userId]/UserDetailsClient.tsx
 'use client'
 
 import Link from 'next/link'
@@ -8,6 +7,7 @@ import { AdminPageHeader } from '@/app/(authenticated)/admin/_components/AdminPa
 import { StatusBadge } from '@/app/(authenticated)/admin/_components/StatusBadge'
 import { formatCurrency } from '@/lib/utils/currency.utils'
 import { formatDate } from '@/lib/utils/date-utils'
+import { EditableEmail } from './_components/EditableEmail'
 
 const ROLE_LABEL: Record<string, string> = {
   SUPERUSER: 'Super user',
@@ -24,9 +24,7 @@ const ORDER_TYPE_LABEL: Record<string, string> = {
 
 const Section = ({ title, children }: { title: string; children: ReactNode }) => (
   <section className="pt-4 border-t border-neutral-200 dark:border-neutral-800">
-    <h2 className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-3">
-      {title}
-    </h2>
+    <h2 className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-3">{title}</h2>
     {children}
   </section>
 )
@@ -85,7 +83,10 @@ export function UserDetailsClient({ user }: { user: any }) {
             <Section title="Contact">
               <div className="space-y-3">
                 <Field label="Name" value={fullName} />
-                <Field label="Email" value={user.email} className="break-all" />
+                <div>
+                  <p className="text-xs text-neutral-400 dark:text-neutral-600">Email</p>
+                  <EditableEmail userId={user.id} email={user.email} />
+                </div>
                 <Field label="Phone" value={user.phone} />
               </div>
             </Section>

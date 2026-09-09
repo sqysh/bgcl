@@ -2,30 +2,17 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Play,
-  X,
-  Target,
-  Users,
-  Building2,
-  Heart,
-  ArrowRight,
-  CheckCircle2,
-  Phone,
-  Mail,
-  MapPin,
-  FileText
-} from 'lucide-react'
+import { Play, X, Target, Users, Building2, Heart, ArrowRight, CheckCircle2, Phone, Mail, MapPin, FileText } from 'lucide-react'
 import Link from 'next/link'
 import Picture from '@/components/_shared/Picture'
 
-export default function PublicCapitalCampaignClient({ pageData }) {
+export default function PublicCapitalCampaignClient({ pageData, capitalCampaign }) {
   const t = pageData?.sections?.campaign
   const [videoModalOpen, setVideoModalOpen] = useState(false)
   const [currentVideo, setCurrentVideo] = useState<string | null>(null)
 
-  const goalAmount = Number(t?.goal_amount)
-  const raisedAmount = Number(t?.raised_amount)
+  const goalAmount = Number(capitalCampaign.goalAmount)
+  const raisedAmount = Number(capitalCampaign.raisedAmount)
   const progressPercent = (raisedAmount / goalAmount) * 100
 
   const expansionFeatures = [
@@ -70,9 +57,7 @@ export default function PublicCapitalCampaignClient({ pageData }) {
               <p className="text-xs font-semibold dark:text-neutral-500 text-neutral-600 uppercase tracking-widest">
                 {t?.eyebrow}
               </p>
-              <h1 className="text-5xl md:text-6xl font-black dark:text-white text-neutral-900 leading-tight">
-                {t?.heading}
-              </h1>
+              <h1 className="text-5xl md:text-6xl font-black dark:text-white text-neutral-900 leading-tight">{t?.heading}</h1>
               <p className="text-lg dark:text-neutral-400 text-neutral-600 max-w-2xl">{t?.subheading}</p>
             </div>
 
@@ -127,10 +112,7 @@ export default function PublicCapitalCampaignClient({ pageData }) {
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="relative">
                   {/* Pulse ring */}
-                  <div
-                    className="absolute inset-0 rounded-full bg-white/30 animate-ping"
-                    style={{ animationDuration: '2s' }}
-                  />
+                  <div className="absolute inset-0 rounded-full bg-white/30 animate-ping" style={{ animationDuration: '2s' }} />
 
                   {/* Button */}
                   <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/90 group-hover:bg-white group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-2xl">
@@ -155,9 +137,7 @@ export default function PublicCapitalCampaignClient({ pageData }) {
           {/* Content */}
           <div className="grid lg:grid-cols-2 gap-16 items-start">
             <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <h2 className="text-4xl md:text-5xl font-black dark:text-white text-neutral-900 mb-6">
-                {t?.about_heading}
-              </h2>
+              <h2 className="text-4xl md:text-5xl font-black dark:text-white text-neutral-900 mb-6">{t?.about_heading}</h2>
               <div className="space-y-4 text-lg dark:text-neutral-300 text-neutral-700 leading-relaxed">
                 <p>{t?.about_paragraph1}</p>
                 <p>{t?.about_paragraph2}</p>
@@ -300,9 +280,7 @@ export default function PublicCapitalCampaignClient({ pageData }) {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl md:text-5xl font-black dark:text-white text-neutral-900 mb-4">
-              {t?.renderings_heading}
-            </h2>
+            <h2 className="text-4xl md:text-5xl font-black dark:text-white text-neutral-900 mb-4">{t?.renderings_heading}</h2>
             <p className="text-lg dark:text-neutral-400 text-neutral-600">{t?.renderings_subheading}</p>
           </motion.div>
 
@@ -344,9 +322,7 @@ export default function PublicCapitalCampaignClient({ pageData }) {
             viewport={{ once: true }}
             className="text-center"
           >
-            <h2 className="text-4xl md:text-5xl font-black dark:text-white text-neutral-900 mb-12">
-              {t?.financials_heading}
-            </h2>
+            <h2 className="text-4xl md:text-5xl font-black dark:text-white text-neutral-900 mb-12">{t?.financials_heading}</h2>
 
             {/* Goal */}
             <div className="mb-8">
@@ -379,9 +355,8 @@ export default function PublicCapitalCampaignClient({ pageData }) {
 
             {/* Quote */}
             <blockquote className="text-xl md:text-2xl dark:text-neutral-300 text-neutral-700 italic mb-12 max-w-3xl mx-auto">
-              "Together, we can ensure that our community's youth go on to reach their full potential. At the Boys &
-              Girls Club of Lynn we believe that{' '}
-              <span className="text-sky-500 font-semibold not-italic">Great Futures Start Here</span>."
+              "Together, we can ensure that our community's youth go on to reach their full potential. At the Boys & Girls Club of
+              Lynn we believe that <span className="text-sky-500 font-semibold not-italic">Great Futures Start Here</span>."
             </blockquote>
 
             <Link
@@ -400,9 +375,7 @@ export default function PublicCapitalCampaignClient({ pageData }) {
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <h2 className="text-4xl md:text-5xl font-black dark:text-white text-neutral-900 mb-6">
-                {t?.cta_heading}
-              </h2>
+              <h2 className="text-4xl md:text-5xl font-black dark:text-white text-neutral-900 mb-6">{t?.cta_heading}</h2>
               <p className="text-lg dark:text-neutral-300 text-neutral-700 mb-8 leading-relaxed">{t?.cta_subheading}</p>
 
               <div className="mb-8">

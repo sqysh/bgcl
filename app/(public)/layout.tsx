@@ -3,10 +3,10 @@ import { ReactNode } from 'react'
 import PublicChrome from './_components/PublicChrome'
 
 export default async function PublicLayout({ children }: { children: ReactNode }) {
-  const { donationOrders, capitalPage, hero } = await getPublicLayoutData()
+  const { donationOrders, capitalPage, hero, capitalCampaign } = await getPublicLayoutData()
 
   return (
-    <PublicChrome capitalPage={capitalPage} donations={donationOrders.data} hero={hero?.data}>
+    <PublicChrome capitalPage={capitalPage} donations={donationOrders.data} hero={hero?.data} capitalCampaign={capitalCampaign}>
       {children}
     </PublicChrome>
   )

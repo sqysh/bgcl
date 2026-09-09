@@ -3,7 +3,8 @@
 import prisma from '@/prisma/client'
 import { createLog } from '../log/createLog'
 import { requireAdmin } from '@/lib/utils/requireAdmin'
-import { OrderStatus } from '@prisma/client'
+import { OrderStatus, PendingStaffInvite } from '@prisma/client'
+import { getPendingStaffInvites } from '../user/staff-access/getPendingStaffInvites'
 
 export interface RecentOrder {
   id: string
@@ -30,6 +31,7 @@ export interface DashboardStats {
   ticketOrders: number
   donationRevenue: number
   donationOrders: number
+  invites: PendingStaffInvite[]
 }
 
 export async function getDashboardStats(): Promise<{
@@ -53,7 +55,7 @@ export async function getDashboardStats(): Promise<{
     const confirmed = { status: OrderStatus.CONFIRMED }
 
     // Summed in Postgres rather than in JS, so this stays flat as orders grow
-    const [allTime, thisMonth, lastMonth, totalSupporters, newSupportersThisMonth, ticketsSold, byType, recentOrders] =
+    const [allTime, thisMonth, lastMonth, totalSupporters, newSupportersThisMonth, ticketsSold, byType, recentOrders, invites] =
       await Promise.all([
         prisma.order.aggregate({
           where: revenueStatuses,
@@ -104,7 +106,9 @@ export async function getDashboardStats(): Promise<{
             user: { select: { firstName: true, lastName: true, email: true } },
             event: { select: { title: true } }
           }
-        })
+        }),
+
+        getPendingStaffInvites()
       ])
 
     const sumFor = (types: string[]) =>
@@ -135,7 +139,8 @@ export async function getDashboardStats(): Promise<{
         ticketRevenue: sumFor(TICKET_TYPES),
         ticketOrders: countFor(TICKET_TYPES),
         donationRevenue: sumFor(DONATION_TYPES),
-        donationOrders: countFor(DONATION_TYPES)
+        donationOrders: countFor(DONATION_TYPES),
+        invites
       }
     }
   } catch (error) {

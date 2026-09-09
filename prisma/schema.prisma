@@ -739,6 +739,23 @@ model CITApplication {
   status CITApplicationStatus @default(PENDING)
 }
 
+model CapitalCampaign {
+  id           String   @id @default(cuid())
+  goalAmount   Decimal  @db.Decimal(12, 2)
+  raisedAmount Decimal  @db.Decimal(12, 2)
+  updatedAt    DateTime @updatedAt
+}
+
+model PendingStaffInvite {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  role      Role
+  invitedBy String
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
 enum CITApplicationStatus {
   PENDING
   REVIEWED

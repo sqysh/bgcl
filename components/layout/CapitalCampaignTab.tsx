@@ -19,7 +19,7 @@ const CAPITAL_CAMPAIGN_LINKS = [
   '/cit'
 ]
 
-export default function CapitalCampaignTab({ pageData }) {
+export default function CapitalCampaignTab({ pageData, capitalCampaign }) {
   const t = pageData?.sections?.campaign
   const pathname = usePathname()
   const [isHovered, setIsHovered] = useState(true)
@@ -50,14 +50,12 @@ export default function CapitalCampaignTab({ pageData }) {
 
   if (CAPITAL_CAMPAIGN_LINKS.some((link) => pathname.includes(link))) return null
 
-  const goalAmount = Number(t?.goal_amount) || 30000000
-  const raisedAmount = Number(t?.raised_amount) || 18053600
+  const goalAmount = Number(capitalCampaign.goalAmount) || 30000000
+  const raisedAmount = Number(capitalCampaign.raisedAmount) || 18053600
   const progressPercent = (raisedAmount / goalAmount) * 100
 
   const fmtMoney = (n: number) =>
-    n >= 1000000
-      ? `$${(n / 1000000).toLocaleString('en-US', { maximumFractionDigits: 1 })}M`
-      : `$${n.toLocaleString('en-US')}`
+    n >= 1000000 ? `$${(n / 1000000).toLocaleString('en-US', { maximumFractionDigits: 1 })}M` : `$${n.toLocaleString('en-US')}`
 
   const raisedLabel = fmtMoney(raisedAmount)
   const goalLabel = fmtMoney(goalAmount)

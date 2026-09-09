@@ -8,8 +8,10 @@ import { adminNavigationLinkData, NavItem } from '@/app/(authenticated)/admin/_u
 import { useSidebarStore } from '@/stores/useSidebarStore'
 import extractErrorMessage from '@/lib/utils/extractErrorMessage'
 import { InlineMessage, InlineMessageState } from '@/components/_shared/InlineMessage'
-import { Role } from '@prisma/client'
+import { Role, User } from '@prisma/client'
 import { ModalToggle } from './_components/ModalToggle'
+import { CapitalCampaignEditor } from './_components/CapitalCampaignEditor'
+import { GrantStaffAccessButton } from './_components/GrantStaffAccessButton'
 
 type SidebarUser = {
   role: Role
@@ -18,7 +20,17 @@ type SidebarUser = {
   email?: string | null
 }
 
-export default function AdminSidebar({ user, isModalEnabled }: { user: SidebarUser; isModalEnabled: boolean }) {
+export default function AdminSidebar({
+  user,
+  isModalEnabled,
+  campaign,
+  users
+}: {
+  user: SidebarUser
+  isModalEnabled: boolean
+  campaign: { goalAmount: number; raisedAmount: number }
+  users: User[]
+}) {
   const pathname = usePathname()
   const router = useRouter()
   const onClose = useSidebarStore((s) => s.closeAdminSidebar)
@@ -137,6 +149,8 @@ export default function AdminSidebar({ user, isModalEnabled }: { user: SidebarUs
       {(user.role === 'ADMIN' || user.role === 'SUPERUSER') && (
         <div className="shrink-0 border-t dark:border-neutral-800 border-neutral-200 px-3 py-2 space-y-0.5">
           <ModalToggle initialEnabled={isModalEnabled} />
+          <CapitalCampaignEditor goalAmount={campaign.goalAmount} raisedAmount={campaign.raisedAmount} />
+          <GrantStaffAccessButton users={users} />
 
           {user.role === 'SUPERUSER' && (
             <Link
@@ -163,9 +177,7 @@ export default function AdminSidebar({ user, isModalEnabled }: { user: SidebarUs
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-medium dark:text-white text-neutral-900 truncate leading-tight">
-              {displayName}
-            </p>
+            <p className="text-[13px] font-medium dark:text-white text-neutral-900 truncate leading-tight">{displayName}</p>
             <p className="text-[11px] dark:text-neutral-500 text-neutral-500 truncate">{user.email}</p>
           </div>
 

@@ -2,6 +2,60 @@ import { ChangelogEntry, ChangeType, ImpactLevel } from '../_types/changelog.typ
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: '1.24.0',
+    date: '2026-09-06',
+    changes: [
+      {
+        type: 'feature',
+        title: 'Table reservation page',
+        description:
+          'A standalone page where guests can put a deposit on a table for next year. It opens only during a set window, shows how many tables are left, and limits each person to two.',
+        impact: 'high'
+      },
+      {
+        type: 'feature',
+        title: 'Grant admin and program access',
+        description:
+          'Access can now be given from the admin by email. If the person has never signed in, the invite waits and applies automatically the first time they do, and pending invites are listed on the dashboard where they can be revoked.',
+        impact: 'high'
+      },
+      {
+        type: 'feature',
+        title: 'User detail page',
+        description:
+          'Clicking a user now opens a full record showing their contact details, address, account history and every order they have placed. Their email address can be corrected from here.',
+        impact: 'medium'
+      },
+      {
+        type: 'improvement',
+        title: 'Capital campaign figures moved out of the page editor',
+        description:
+          'The goal and the amount raised were buried in the page content editor. They now sit in the admin sidebar, so the total shown on the site can be updated in a couple of clicks from anywhere in the admin.',
+        impact: 'medium'
+      },
+      {
+        type: 'feature',
+        title: 'Last sign-in recorded',
+        description: 'The admin now shows when each person last signed in.',
+        impact: 'low'
+      },
+      {
+        type: 'improvement',
+        title: 'Event list shows more at a glance',
+        description:
+          'Each event now shows its date, whether it is public, how many ticket types it has, and exactly when ticket sales open or close. Events missing a sales window are flagged.',
+        impact: 'low'
+      },
+      {
+        type: 'ui',
+        title: 'Cleaner admin screens',
+        description:
+          'The user, order and campaign panels have been redrawn with a lighter, flatter look, and buttons now show when an action is running.',
+        impact: 'low'
+      }
+    ]
+  },
+  {
     version: '1.23.0',
     date: '2026-08-31',
     changes: [
@@ -2248,8 +2302,7 @@ export const changelogData: ChangelogEntry[] = [
       {
         type: 'improvement',
         title: 'Navigation Structure',
-        description:
-          'Reorganized navigation to match new page structure. Added dropdown menus for Programs and News sections.',
+        description: 'Reorganized navigation to match new page structure. Added dropdown menus for Programs and News sections.',
         impact: 'medium'
       },
       {
@@ -2269,8 +2322,7 @@ export const changelogData: ChangelogEntry[] = [
       {
         type: 'feature',
         title: 'Admin Dashboard Foundation',
-        description:
-          'Started building admin dashboard with authentication, content management, and analytics foundations.',
+        description: 'Started building admin dashboard with authentication, content management, and analytics foundations.',
         impact: 'medium'
       }
     ]
