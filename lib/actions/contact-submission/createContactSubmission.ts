@@ -15,9 +15,25 @@ import {
 } from '@/lib/validations/contact-submission.validation'
 import { emptyToNull } from '@/lib/utils/emptyToNull'
 
+const MIN_FILL_MS = 3000
+
+/**
+ * A flooder fills every field it finds and submits immediately. Neither check
+ * is visible to a person, and a caught submission still reports success so the
+ * sender learns nothing and keeps posting into the void.
+ */
+const looksAutomated = (data: Record<string, unknown>) => {
+  const website = typeof data.website === 'string' ? data.website : ''
+  const renderedAt = typeof data.renderedAt === 'number' ? data.renderedAt : 0
+
+  if (website.trim().length > 0) return 'honeypot'
+  if (renderedAt && Date.now() - renderedAt < MIN_FILL_MS) return 'submitted too fast'
+
+  return null
+}
+
 export const createContactSubmission = async (type: ContactSubmissionType, input: unknown) => {
-  const parsed =
-    type === 'VOLUNTEER' ? volunteerSubmissionSchema.safeParse(input) : contactSubmissionSchema.safeParse(input)
+  const parsed = type === 'VOLUNTEER' ? volunteerSubmissionSchema.safeParse(input) : contactSubmissionSchema.safeParse(input)
 
   if (!parsed.success) {
     const issue = parsed.error.issues[0]
@@ -28,6 +44,19 @@ export const createContactSubmission = async (type: ContactSubmissionType, input
   }
 
   const data = parsed.data
+
+  const automated = looksAutomated(data)
+
+  if (automated) {
+    await createLog('info', 'Contact submission discarded as automated', {
+      reason: automated,
+      type,
+      email: data.email
+    })
+
+    // Same shape as a real success, so nothing signals that it was rejected
+    return { success: true, data: null }
+  }
 
   // The volunteer branch carries the extra columns. `status` defaults to NEW in Prisma.
   const createData: Prisma.ContactSubmissionUncheckedCreateInput =

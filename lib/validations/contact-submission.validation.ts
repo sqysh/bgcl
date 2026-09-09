@@ -8,7 +8,9 @@ const contactFields = {
   firstName: z.string().trim().min(1, { error: 'Please enter a first name' }),
   lastName: z.string().trim().min(1, { error: 'Please enter a last name' }),
   email: z.email({ error: 'Please enter a valid email address' }),
-  phone: z.string().trim().min(1, { error: 'Please enter a phone number' })
+  phone: z.string().trim().min(1, { error: 'Please enter a phone number' }),
+  website: z.string().trim().optional().default(''),
+  renderedAt: z.coerce.number().optional().default(0)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -18,7 +20,14 @@ const contactFields = {
 export const contactSubmissionSchema = z.object({
   ...contactFields,
   subject: z.string().trim().nullish(),
-  message: z.string().trim().min(1, { error: 'Please enter a message' })
+  message: z.string().trim().min(1, { error: 'Please enter a message' }),
+  // Hidden from people, filled in by bots. Validation passes either way so the
+  // flooder cannot tell it was caught; the action decides what to do with it.
+  website: z.string().trim().optional().default(''),
+
+  // When the form was rendered. A submission that arrives within a couple of
+  // seconds was not typed by a person.
+  renderedAt: z.coerce.number().optional().default(0)
 })
 
 export type ContactSubmissionFormInput = z.input<typeof contactSubmissionSchema>
@@ -30,7 +39,9 @@ export const EMPTY_CONTACT_SUBMISSION: ContactSubmissionFormInput = {
   email: '',
   phone: '',
   subject: '',
-  message: ''
+  message: '',
+  website: '',
+  renderedAt: 0
 }
 
 export const CONTACT_SUBMISSION_NULLABLE_FIELDS = ['subject'] as const
@@ -56,9 +67,7 @@ export const volunteerSubmissionSchema = z.object({
 
   // `z.literal(true)` would narrow the inferred type to `true` and break EMPTY_*,
   // so refine instead.
-  backgroundCheckAck: z
-    .boolean()
-    .refine((value) => value === true, { error: 'Please acknowledge the background check' }),
+  backgroundCheckAck: z.boolean().refine((value) => value === true, { error: 'Please acknowledge the background check' }),
 
   additionalInfo: z.string().trim().nullish()
 })

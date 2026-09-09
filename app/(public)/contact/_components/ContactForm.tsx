@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -26,12 +26,18 @@ export default function ContactForm({ defaultSubject }: { defaultSubject?: strin
     handleSubmit,
     reset,
     setError,
+    setValue,
     formState: { errors, isSubmitting }
   } = useForm<ContactSubmissionFormInput, unknown, ContactSubmissionFormValues>({
     resolver: zodResolver(contactSubmissionSchema),
     defaultValues: { ...EMPTY_CONTACT_SUBMISSION, subject: defaultSubject ?? '' },
     mode: 'onTouched'
   })
+
+  // Stamped after mount so it reflects when the person actually saw the form
+  useEffect(() => {
+    setValue('renderedAt', Date.now())
+  }, [setValue])
 
   const onSubmit = handleSubmit(async (values) => {
     try {
@@ -98,6 +104,13 @@ export default function ContactForm({ defaultSubject }: { defaultSubject?: strin
               {errors.root.message}
             </div>
           )}
+          {/* Left empty by people, filled in by bots */}
+          <div aria-hidden="true" className="absolute w-px h-px overflow-hidden -left-96">
+            <label htmlFor="website">Website</label>
+            <input id="website" type="text" tabIndex={-1} autoComplete="off" {...register('website')} />
+          </div>
+
+          <input type="hidden" {...register('renderedAt')} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
@@ -237,9 +250,7 @@ export default function ContactForm({ defaultSubject }: { defaultSubject?: strin
             )}
           </button>
 
-          <p className="text-xs dark:text-neutral-500 text-neutral-600 text-center">
-            Fields marked with * are required
-          </p>
+          <p className="text-xs dark:text-neutral-500 text-neutral-600 text-center">Fields marked with * are required</p>
         </div>
       </div>
     </motion.form>
