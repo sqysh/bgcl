@@ -756,6 +756,14 @@ model PendingStaffInvite {
   @@index([email])
 }
 
+model SignInAttempt {
+  id         String   @id @default(cuid())
+  identifier String // an ip address or an email address
+  createdAt  DateTime @default(now())
+
+  @@index([identifier, createdAt])
+}
+
 enum CITApplicationStatus {
   PENDING
   REVIEWED

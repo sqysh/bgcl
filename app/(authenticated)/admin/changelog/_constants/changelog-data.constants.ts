@@ -2,6 +2,33 @@ import { ChangelogEntry, ChangeType, ImpactLevel } from '../_types/changelog.typ
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: '1.25.0',
+    date: '2026-09-10',
+    changes: [
+      {
+        type: 'fix',
+        title: 'Sign-in links no longer expire before you click them',
+        description:
+          'Email security filters open every link in a message to check it is safe, which used up the sign-in link before the recipient could click it. Links now open a page with a button on it, so the link is only spent when a person presses it.',
+        impact: 'high'
+      },
+      {
+        type: 'fix',
+        title: 'Stopped automated sign-up attempts',
+        description:
+          'Someone was pushing a list of harvested email addresses through the sign-in form, which created hundreds of empty accounts and sent club emails to people who never asked for them. Sign-in requests are now limited per address and per location.',
+        impact: 'high'
+      },
+      {
+        type: 'fix',
+        title: 'Stopped junk contact form submissions',
+        description:
+          'Automated submissions were filling the contact list and sending a notification for each one. They are now detected and discarded before they reach the inbox or the admin.',
+        impact: 'high'
+      }
+    ]
+  },
+  {
     version: '1.24.0',
     date: '2026-09-06',
     changes: [

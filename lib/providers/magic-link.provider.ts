@@ -1,7 +1,33 @@
+import { headers } from 'next/headers'
 import type { EmailConfig } from 'next-auth/providers/email'
 import magicLinkTemplate from '../email-templates/magic-link'
 import { createLog } from '../actions/log/createLog'
 import { resend } from '../resend/resend'
+import { checkSignInRateLimit } from '../utils/signInRateLimit'
+
+/**
+ * Mail security scanners issue a GET to every link in an incoming message to
+ * check it is safe, and a sign-in link works once, so the scanner spends the
+ * token before the person clicks. The email points at a confirmation page
+ * instead: loading that page consumes nothing, and only pressing the button on
+ * it reaches the callback.
+ */
+const toConfirmUrl = (callbackUrl: string) => {
+  const confirmUrl = new URL('/auth/verify', new URL(callbackUrl).origin)
+  confirmUrl.searchParams.set('callback', callbackUrl)
+
+  return confirmUrl.toString()
+}
+
+const getIp = async () => {
+  try {
+    const headerList = await headers()
+
+    return headerList.get('x-forwarded-for')?.split(',')[0]?.trim() ?? headerList.get('x-real-ip')
+  } catch {
+    return null
+  }
+}
 
 const magicLinkProvider: EmailConfig = {
   id: 'email',
@@ -10,12 +36,30 @@ const magicLinkProvider: EmailConfig = {
   maxAge: 15 * 60, // 15 mins
   from: process.env.RESEND_FROM_EMAIL!,
   sendVerificationRequest: async ({ identifier: email, url, provider }) => {
+    const ip = await getIp()
+
+    // Someone was spraying a harvested list through this form, which created
+    // accounts and sent our mail to people who never asked for it
+    const limit = await checkSignInRateLimit({ email, ip })
+
+    if (limit.allowed === false) {
+      await createLog('warn', 'Sign-in request rate limited', {
+        location: ['magicLinkProvider.ts'],
+        email,
+        ip,
+        reason: limit.reason
+      })
+
+      // Returning quietly rather than throwing, so the sender is told nothing
+      return
+    }
+
     try {
       const result = await resend.emails.send({
-        from: `Boys & Girls Club <${provider.from!}>`,
+        from: `Boys & Girls Club of Lynn <${provider.from!}>`,
         to: email,
         subject: 'Sign in to Boys & Girls Club of Lynn',
-        html: magicLinkTemplate(url)
+        html: magicLinkTemplate(toConfirmUrl(url))
       })
 
       await createLog('info', 'Magic link sent successfully', {
