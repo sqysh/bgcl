@@ -7,8 +7,14 @@ import { ThemeScript } from '@/lib/scripts/ThemeScript'
 import { lexend, pinyon } from '@/lib/fonts'
 import { JsonLd } from '@/lib/scripts/JsonLd'
 import { ThemeProvider } from '@/lib/providers/theme.provider'
+import { Viewport } from 'next'
 
 export const metadata = siteMetadata
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1
+}
 
 export default async function RootLayout({
   children

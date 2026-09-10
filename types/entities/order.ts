@@ -1,6 +1,5 @@
-import type { JsonValue } from '@prisma/client/runtime/library'
 import type { IOrderItem } from './order-item'
-import type { Campaign, Event } from '@prisma/client'
+import type { Campaign, Event, Prisma } from '@prisma/client'
 import type { UserWithAddress } from '../user.types'
 
 export type OrderType = 'ONE_TIME_DONATION' | 'RECURRING_DONATION' | 'TICKET_PURCHASE'
@@ -43,7 +42,7 @@ export interface IOrder {
   customerEmail: string
   customerName: string
   customerPhone: string | null
-  billingAddress: Record<string, any> | null | JsonValue
+  billingAddress: Record<string, any> | null | Prisma.JsonValue
   notes?: string | null
 
   // Recurring

@@ -122,12 +122,16 @@ export default function Header() {
                 {isAdmin ? 'Dashboard' : 'My Account'}
               </button>
             ) : (
-              <Link
-                href="/auth/login"
-                className="dark:text-neutral-300 dark:hover:text-white text-neutral-700 hover:text-neutral-900 text-sm font-medium transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
+              <button
+                type="button"
+                onClick={() => startTransition(() => router.push('/auth/login'))}
+                disabled={isPending}
+                aria-busy={isPending}
+                className="inline-flex items-center gap-1.5 dark:text-neutral-300 dark:hover:text-white text-neutral-700 hover:text-neutral-900 text-sm font-medium transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
               >
+                {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden="true" />}
                 Sign In
-              </Link>
+              </button>
             )}
           </div>
         </div>

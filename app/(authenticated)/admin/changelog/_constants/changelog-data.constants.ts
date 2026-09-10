@@ -2,6 +2,32 @@ import { ChangelogEntry, ChangeType, ImpactLevel } from '../_types/changelog.typ
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: '1.27.0',
+    date: '2026-09-10',
+    changes: [
+      {
+        type: 'improvement',
+        title: 'Database layer brought up to date',
+        description:
+          'The database toolkit has been upgraded two major versions, which changes how the site connects to the database and suits how it runs on the hosting platform. No visible change, but it keeps the site on supported software.',
+        impact: 'low'
+      },
+      {
+        type: 'fix',
+        title: 'Card fields size correctly on phones',
+        description:
+          'A missing setting meant the card entry fields at checkout could render at the wrong size on a phone. Fixed.',
+        impact: 'medium'
+      },
+      {
+        type: 'ui',
+        title: 'Sign-in and account links show when they are loading',
+        description: 'The links in the header now show a spinner while the next page loads.',
+        impact: 'low'
+      }
+    ]
+  },
+  {
     version: '1.26.0',
     date: '2026-09-10',
     changes: [
