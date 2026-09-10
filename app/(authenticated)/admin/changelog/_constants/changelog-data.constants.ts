@@ -2,6 +2,26 @@ import { ChangelogEntry, ChangeType, ImpactLevel } from '../_types/changelog.typ
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: '1.26.0',
+    date: '2026-09-10',
+    changes: [
+      {
+        type: 'feature',
+        title: 'Bot check on the sign-in form',
+        description:
+          'Sign-in requests are now verified before anything is created or sent. Most people will not notice it beyond a tick on the form, but it stops the automated attempts that were creating empty accounts and sending club emails to people who never asked for them.',
+        impact: 'high'
+      },
+      {
+        type: 'ui',
+        title: 'Cleaner sign-in email',
+        description:
+          'The sign-in email has been redrawn to match the rest of the club emails, with clearer wording about how long the link lasts.',
+        impact: 'low'
+      }
+    ]
+  },
+  {
     version: '1.25.0',
     date: '2026-09-10',
     changes: [

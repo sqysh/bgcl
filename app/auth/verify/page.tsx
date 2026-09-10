@@ -1,5 +1,17 @@
+// app/auth/verify/page.tsx
 import Link from 'next/link'
 import Picture from '@/components/_shared/Picture'
+import { ConfirmSignInButton } from './_components/ConfirmSignInButton'
+
+const isCallbackUrl = (value?: string) => {
+  if (!value) return false
+
+  try {
+    return new URL(value).pathname.startsWith('/api/auth/callback/')
+  } catch {
+    return false
+  }
+}
 
 /**
  * Fetching this page does nothing. The token is only spent when the button is
@@ -8,7 +20,7 @@ import Picture from '@/components/_shared/Picture'
 export default async function VerifyPage({ searchParams }: { searchParams: Promise<{ callback?: string }> }) {
   const { callback } = await searchParams
 
-  const isValid = Boolean(callback && new URL(callback).pathname.startsWith('/api/auth/callback/'))
+  const isValid = isCallbackUrl(callback)
 
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950 flex flex-col">
@@ -28,7 +40,7 @@ export default async function VerifyPage({ searchParams }: { searchParams: Promi
           />
         </Link>
 
-        {isValid ? (
+        {isValid && callback ? (
           <>
             <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Confirm your sign-in</h1>
 
@@ -36,13 +48,7 @@ export default async function VerifyPage({ searchParams }: { searchParams: Promi
               Press the button below to finish signing in. This link works once, so open it on the device you want to use.
             </p>
 
-            <a
-              href={callback}
-              rel="nofollow noreferrer"
-              className="mt-8 w-full inline-flex items-center justify-center px-5 py-4 rounded-lg text-[15px] font-semibold text-white bg-sky-600 hover:bg-sky-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-            >
-              Sign in
-            </a>
+            <ConfirmSignInButton href={callback} />
           </>
         ) : (
           <>

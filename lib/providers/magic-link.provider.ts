@@ -1,9 +1,9 @@
-import { headers } from 'next/headers'
 import type { EmailConfig } from 'next-auth/providers/email'
 import magicLinkTemplate from '../email-templates/magic-link'
 import { createLog } from '../actions/log/createLog'
 import { resend } from '../resend/resend'
 import { checkSignInRateLimit } from '../utils/signInRateLimit'
+import { getIp } from '../utils/getIp'
 
 /**
  * Mail security scanners issue a GET to every link in an incoming message to
@@ -17,16 +17,6 @@ const toConfirmUrl = (callbackUrl: string) => {
   confirmUrl.searchParams.set('callback', callbackUrl)
 
   return confirmUrl.toString()
-}
-
-const getIp = async () => {
-  try {
-    const headerList = await headers()
-
-    return headerList.get('x-forwarded-for')?.split(',')[0]?.trim() ?? headerList.get('x-real-ip')
-  } catch {
-    return null
-  }
 }
 
 const magicLinkProvider: EmailConfig = {

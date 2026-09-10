@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Mail, ArrowLeft } from 'lucide-react'
 import { signIn } from 'next-auth/react'
 import { LoginError } from './LoginError'
 import { GoogleIcon } from '@/components/ui/icons/GoogleIcon'
+import { requestMagicLink } from '@/lib/auth/requestMagicLink'
+import { Turnstile } from '@/components/_shared/Turnstile'
 
 type Pending = 'google' | 'email' | null
 
@@ -28,8 +30,13 @@ export function LoginForm() {
   const [pending, setPending] = useState<Pending>(null)
   const [emailSent, setEmailSent] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [resetSignal, setResetSignal] = useState(0)
 
   const busy = pending !== null
+
+  // Stable so the widget is not torn down and rebuilt on every render
+  const handleToken = useCallback((token: string | null) => setTurnstileToken(token), [])
 
   const handleGoogleSignIn = async () => {
     setErrorMsg('')
@@ -42,9 +49,7 @@ export function LoginForm() {
       const message = error instanceof Error ? error.message : ''
 
       setErrorMsg(
-        message.includes('popup')
-          ? 'Please allow popups and try again.'
-          : 'Unable to connect with Google. Please try again.'
+        message.includes('popup') ? 'Please allow popups and try again.' : 'Unable to connect with Google. Please try again.'
       )
       setPending(null)
     }
@@ -64,20 +69,20 @@ export function LoginForm() {
     setPending('email')
 
     try {
-      const result = await signIn('email', { email: trimmed, redirect: false, redirectTo: '/auth/login' })
+      // Goes through a server action rather than signIn directly, so the
+      // Turnstile token is checked before anything is created or sent
+      const result = await requestMagicLink({ email: trimmed, token: turnstileToken ?? undefined })
 
-      if (result?.ok) {
+      if (result.success) {
         setEmailSent(true)
         return
       }
 
-      setErrorMsg(
-        result?.error === 'EmailSignin'
-          ? 'That email address looks invalid. Check it and try again.'
-          : 'Something went wrong sending your link. Please try again.'
-      )
+      setErrorMsg(result.error ?? 'Something went wrong sending your link. Please try again.')
+      setResetSignal((n) => n + 1)
     } catch {
       setErrorMsg('Unable to send the sign-in link. Please try again.')
+      setResetSignal((n) => n + 1)
     } finally {
       setPending(null)
     }
@@ -179,17 +184,17 @@ export function LoginForm() {
           />
         </div>
 
+        <div className="flex justify-center">
+          <Turnstile action="signin" onToken={handleToken} resetSignal={resetSignal} />
+        </div>
+
         <button
           type="submit"
           disabled={busy}
           aria-busy={pending === 'email'}
-          className={`${buttonBase} bg-sky-600 hover:bg-sky-500 text-white`}
+          className={`${buttonBase} mt-4 bg-sky-600 hover:bg-sky-500 text-white`}
         >
-          {pending === 'email' ? (
-            <Spinner className="border-sky-500" />
-          ) : (
-            <Mail className="w-4 h-4" aria-hidden="true" />
-          )}
+          {pending === 'email' ? <Spinner className="border-sky-500" /> : <Mail className="w-4 h-4" aria-hidden="true" />}
           {pending === 'email' ? 'Sending…' : 'Send sign-in link'}
         </button>
       </form>

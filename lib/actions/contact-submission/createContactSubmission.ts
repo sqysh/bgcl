@@ -51,7 +51,9 @@ export const createContactSubmission = async (type: ContactSubmissionType, input
     await createLog('info', 'Contact submission discarded as automated', {
       reason: automated,
       type,
-      email: data.email
+      email: data.email,
+      renderedAt: data.renderedAt,
+      elapsedMs: data.renderedAt ? Date.now() - data.renderedAt : null
     })
 
     // Same shape as a real success, so nothing signals that it was rejected
