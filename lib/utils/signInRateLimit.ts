@@ -1,4 +1,3 @@
-// lib/utils/signInRateLimit.ts
 import prisma from '@/prisma/client'
 
 const WINDOW_MS = 60 * 60 * 1000 // one hour
@@ -9,7 +8,7 @@ const MAX_PER_IP = 10
 
 // A ceiling across everyone, so a spray from many addresses and many IPs cannot
 // eat the month's email allowance. Real sign-in volume here is a few a day.
-const MAX_TOTAL_PER_HOUR = 15
+const MAX_TOTAL_PER_HOUR = 200
 
 export type SignInRateLimitResult = { allowed: true } | { allowed: false; reason: string }
 
