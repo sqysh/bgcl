@@ -1,3 +1,4 @@
+// lib/utils/signInRateLimit.ts
 import prisma from '@/prisma/client'
 
 const WINDOW_MS = 60 * 60 * 1000 // one hour
@@ -5,6 +6,10 @@ const WINDOW_MS = 60 * 60 * 1000 // one hour
 // A person signing in a few times an hour is normal. A list being sprayed is not.
 const MAX_PER_EMAIL = 5
 const MAX_PER_IP = 10
+
+// A ceiling across everyone, so a spray from many addresses and many IPs cannot
+// eat the month's email allowance. Real sign-in volume here is a few a day.
+const MAX_TOTAL_PER_HOUR = 15
 
 export type SignInRateLimitResult = { allowed: true } | { allowed: false; reason: string }
 
@@ -14,13 +19,22 @@ export async function checkSignInRateLimit({ email, ip }: { email: string; ip?: 
   const identifiers = [`email:${email.toLowerCase().trim()}`]
   if (ip) identifiers.push(`ip:${ip}`)
 
-  const attempts = await prisma.signInAttempt.groupBy({
-    by: ['identifier'],
-    where: { identifier: { in: identifiers }, createdAt: { gte: since } },
-    _count: { identifier: true }
-  })
+  const [attempts, globalCount] = await Promise.all([
+    prisma.signInAttempt.groupBy({
+      by: ['identifier'],
+      where: { identifier: { in: identifiers }, createdAt: { gte: since } },
+      _count: { identifier: true }
+    }),
+    prisma.signInAttempt.count({
+      where: { identifier: { startsWith: 'email:' }, createdAt: { gte: since } }
+    })
+  ])
 
   const countFor = (identifier: string) => attempts.find((row) => row.identifier === identifier)?._count.identifier ?? 0
+
+  if (globalCount >= MAX_TOTAL_PER_HOUR) {
+    return { allowed: false, reason: 'global' }
+  }
 
   if (countFor(identifiers[0]) >= MAX_PER_EMAIL) {
     return { allowed: false, reason: 'email' }
@@ -43,7 +57,6 @@ export async function checkSignInRateLimit({ email, ip }: { email: string; ip?: 
   return { allowed: true }
 }
 
-/** Housekeeping, called occasionally rather than on every request */
 export async function pruneSignInAttempts() {
   await prisma.signInAttempt.deleteMany({
     where: { createdAt: { lt: new Date(Date.now() - WINDOW_MS) } }
