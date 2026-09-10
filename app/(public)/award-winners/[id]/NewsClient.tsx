@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -37,9 +37,21 @@ export default function NewsClient({ news }: { news: News }) {
     mode: 'onTouched'
   })
 
+  const [renderedAt, setRenderedAt] = useState(0)
+  const websiteRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setRenderedAt(Date.now())
+  }, [])
+
   const handleSubscribe = handleSubmit(async (values) => {
     try {
-      const res = await createSubscriber(values)
+      const res = await createSubscriber({
+        email: values.email,
+        type: values.type,
+        website: websiteRef.current?.value ?? '',
+        renderedAt
+      })
 
       if (!res.success) {
         setError('root', { message: res.error })
@@ -119,9 +131,7 @@ export default function NewsClient({ news }: { news: News }) {
             </div>
 
             {/* Title */}
-            <h1 className="text-5xl md:text-6xl font-black dark:text-white text-neutral-900 leading-tight">
-              {news?.title}
-            </h1>
+            <h1 className="text-5xl md:text-6xl font-black dark:text-white text-neutral-900 leading-tight">{news?.title}</h1>
 
             {/* Body Text */}
             <div className="space-y-6 text-lg dark:text-neutral-300 text-neutral-700 leading-relaxed">
@@ -138,6 +148,10 @@ export default function NewsClient({ news }: { news: News }) {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="space-y-8"
           >
+            <div aria-hidden="true" className="absolute w-px h-px overflow-hidden -left-96">
+              <label htmlFor="company-website">Website</label>
+              <input id="company-website" ref={websiteRef} type="text" tabIndex={-1} autoComplete="off" />
+            </div>
             {/* Newsletter Signup */}
             <div className="relative overflow-hidden dark:bg-linear-to-br dark:from-neutral-900 dark:to-neutral-800 bg-linear-to-br from-white to-neutral-50 rounded-2xl p-6 border dark:border-neutral-800 border-transparent">
               {/* Decorative linear blur */}
@@ -183,14 +197,9 @@ export default function NewsClient({ news }: { news: News }) {
                       role="status"
                       className="mb-8 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center gap-3"
                     >
-                      <CheckCircle2
-                        className="w-5 h-5 shrink-0 text-green-600 dark:text-green-400"
-                        aria-hidden="true"
-                      />
+                      <CheckCircle2 className="w-5 h-5 shrink-0 text-green-600 dark:text-green-400" aria-hidden="true" />
                       <div>
-                        <p className="text-sm font-semibold text-green-800 dark:text-green-200">
-                          Thanks for subscribing!
-                        </p>
+                        <p className="text-sm font-semibold text-green-800 dark:text-green-200">Thanks for subscribing!</p>
                         <p className="text-xs text-green-700 dark:text-green-300">Check your email for updates</p>
                       </div>
                     </motion.div>
@@ -253,10 +262,7 @@ export default function NewsClient({ news }: { news: News }) {
                     className="gap-x-2 flex items-center px-6 py-3 dark:bg-sky-600 dark:hover:bg-sky-700 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting && (
-                      <div
-                        className="w-4 h-4 rounded-full border-2 border-white border-t-0 animate-spin"
-                        aria-hidden="true"
-                      />
+                      <div className="w-4 h-4 rounded-full border-2 border-white border-t-0 animate-spin" aria-hidden="true" />
                     )}
                     Subscribe
                   </button>

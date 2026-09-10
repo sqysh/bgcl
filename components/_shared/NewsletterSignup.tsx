@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AlertCircle, CheckCircle2, Mail } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -26,8 +26,7 @@ const accents = {
   },
   sky: {
     input: 'focus:ring-sky-600 dark:focus:ring-sky-500',
-    radio:
-      'peer-checked:bg-sky-600 peer-checked:border-sky-600 dark:peer-checked:bg-sky-500 dark:peer-checked:border-sky-500',
+    radio: 'peer-checked:bg-sky-600 peer-checked:border-sky-600 dark:peer-checked:bg-sky-500 dark:peer-checked:border-sky-500',
     button: 'px-6 py-3 rounded-lg bg-sky-600 hover:bg-sky-700 focus-visible:ring-sky-500'
   }
 } as const
@@ -57,9 +56,21 @@ export default function NewsletterSignup({ accent = 'sky' }: Props) {
     mode: 'onTouched'
   })
 
+  const [renderedAt, setRenderedAt] = useState(0)
+  const websiteRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setRenderedAt(Date.now())
+  }, [])
+
   const onSubmit = handleSubmit(async (values) => {
     try {
-      const res = await createSubscriber(values)
+      const res = await createSubscriber({
+        email: values.email,
+        type: values.type,
+        website: websiteRef.current?.value ?? '',
+        renderedAt
+      })
 
       if (!res.success) {
         setError('root', { message: res.error })
@@ -113,6 +124,11 @@ export default function NewsletterSignup({ accent = 'sky' }: Props) {
         )}
       </AnimatePresence>
 
+      <div aria-hidden="true" className="absolute w-px h-px overflow-hidden -left-96">
+        <label htmlFor="company-website">Website</label>
+        <input id="company-website" ref={websiteRef} type="text" tabIndex={-1} autoComplete="off" />
+      </div>
+
       <form onSubmit={onSubmit} noValidate aria-label="Newsletter subscription form" className="space-y-4">
         {/* Email Input */}
         <div>
@@ -144,9 +160,7 @@ export default function NewsletterSignup({ accent = 'sky' }: Props) {
 
         {/* Membership Type */}
         <fieldset className="space-y-3">
-          <legend className="text-xs font-medium dark:text-neutral-400 text-neutral-600 uppercase tracking-wide">
-            I am a:
-          </legend>
+          <legend className="text-xs font-medium dark:text-neutral-400 text-neutral-600 uppercase tracking-wide">I am a:</legend>
           <div className="space-y-2">
             {SUBSCRIBER_TYPE_OPTIONS.map(({ value, label }) => (
               <label key={value} className="flex items-center gap-2.5 cursor-pointer group">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createSubscriber } from '@/lib/actions/subscriber/createSubscriber'
@@ -33,6 +33,12 @@ export default function LatestNewsClient({
   const formRef = useRef<HTMLFormElement>(null)
   const emailInputId = useId()
   const messageId = useId()
+  const [renderedAt, setRenderedAt] = useState(0)
+  const websiteRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setRenderedAt(Date.now())
+  }, [])
 
   const hasError = message?.type === 'error'
 
@@ -53,7 +59,12 @@ export default function LatestNewsClient({
     setIsLoading(true)
 
     try {
-      const res = await createSubscriber({ email, type: memberType })
+      const res = await createSubscriber({
+        email,
+        type: memberType,
+        website: websiteRef.current?.value ?? '',
+        renderedAt
+      })
 
       if (!res?.success) {
         setMessage({
@@ -139,10 +150,7 @@ export default function LatestNewsClient({
                     >
                       {/* News Image */}
                       {newsItem.image && (
-                        <div
-                          className="relative h-48 overflow-hidden dark:bg-neutral-800 bg-neutral-100"
-                          aria-hidden="true"
-                        >
+                        <div className="relative h-48 overflow-hidden dark:bg-neutral-800 bg-neutral-100" aria-hidden="true">
                           {newsItem.externalLink ? (
                             <a
                               href={newsItem.externalLink}
@@ -203,10 +211,7 @@ export default function LatestNewsClient({
                           aria-label={`Read more about ${newsItem.title}`}
                         >
                           Read More
-                          <ArrowRight
-                            className="w-4 h-4 group-hover:translate-x-1 transition-transform"
-                            aria-hidden="true"
-                          />
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                         </Link>
                       </div>
                     </article>
@@ -282,6 +287,11 @@ export default function LatestNewsClient({
                   </div>
                 </fieldset>
 
+                <div aria-hidden="true" className="absolute w-px h-px overflow-hidden -left-96">
+                  <label htmlFor="company-website">Website</label>
+                  <input id="company-website" ref={websiteRef} type="text" tabIndex={-1} autoComplete="off" />
+                </div>
+
                 {/* Email Input and Subscribe */}
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 max-w-md">
                   <div className="flex-1 flex flex-col gap-1">
@@ -330,10 +340,7 @@ export default function LatestNewsClient({
         </section>
 
         {/* Newsletters Section */}
-        <section
-          aria-labelledby="newsletters-heading"
-          className="py-20 px-6 md:px-12 dark:bg-neutral-900/50 bg-neutral-50"
-        >
+        <section aria-labelledby="newsletters-heading" className="py-20 px-6 md:px-12 dark:bg-neutral-900/50 bg-neutral-50">
           <div className="max-w-334 mx-auto">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
@@ -361,11 +368,7 @@ export default function LatestNewsClient({
                   {/* Year header */}
                   <div className="flex items-center gap-4 mb-6">
                     <h3 className="text-2xl font-black dark:text-white text-neutral-900">{year}</h3>
-                    <div
-                      className="flex-1 h-px dark:bg-neutral-800 bg-neutral-200"
-                      role="separator"
-                      aria-hidden="true"
-                    />
+                    <div className="flex-1 h-px dark:bg-neutral-800 bg-neutral-200" role="separator" aria-hidden="true" />
                     <span
                       className="text-xs font-semibold dark:bg-neutral-800 bg-neutral-100 dark:text-neutral-400 text-neutral-600 px-3 py-1 rounded-full"
                       aria-label={`${items.length} issue${items.length !== 1 ? 's' : ''} in ${year}`}
