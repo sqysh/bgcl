@@ -62,10 +62,16 @@ const magicLinkProvider: EmailConfig = {
         html: magicLinkTemplate(toConfirmUrl(url))
       })
 
+      // Resend reports a refusal in the result rather than throwing, so without
+      // this check a rejected send was being logged as a success
+      if (result.error || !result.data?.id) {
+        throw new Error(result.error?.message ?? 'Resend returned no message id')
+      }
+
       await createLog('info', 'Magic link sent successfully', {
         location: ['magicLinkProvider.ts'],
         email,
-        messageId: result.data?.id
+        messageId: result.data.id
       })
     } catch (error) {
       await createLog('error', 'Failed to send magic link email', {
@@ -73,6 +79,7 @@ const magicLinkProvider: EmailConfig = {
         email,
         error: error instanceof Error ? error.message : 'Unknown error'
       })
+
       throw error
     }
   }
