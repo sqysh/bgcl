@@ -41,27 +41,21 @@ export default async function sendConfirmationEmail(
           })
         : ''
 
-      // const raffleDrawDate = event?.raffleDrawDate
-      //   ? `${new Date(event.raffleDrawDate).toLocaleDateString('en-US', {
-      //       weekday: 'long',
-      //       month: 'long',
-      //       day: 'numeric',
-      //       year: 'numeric'
-      //     })} at ${new Date(event.raffleDrawDate).toLocaleTimeString('en-US', {
-      //       hour: 'numeric',
-      //       minute: '2-digit',
-      //       hour12: true,
-      //       timeZone: 'America/New_York'
-      //     })} EST`
-      //   : null
-
       const emailTickets = order.orderItems.map((item: any) => ({
         name: item.ticketName,
         quantity: item.quantity,
         price: item.pricePerUnit,
+        isDeposit: item.ticket?.ticketType === 'DEPOSIT',
         raffleTicketNumber: item.raffleTicketNumber,
         raffleTicketCode: item.raffleTicketCode
       }))
+
+      // A deposit holds a table rather than admitting anyone, so it gets its
+      // own wording throughout
+      const depositCount = emailTickets.reduce(
+        (sum: number, ticket: { isDeposit?: boolean; quantity: number }) => sum + (ticket.isDeposit ? ticket.quantity : 0),
+        0
+      )
 
       emailHtml = ticketPurchaseTemplate(
         order.customerName,
@@ -76,7 +70,10 @@ export default async function sendConfirmationEmail(
         order.id
       )
 
-      subject = `Your Tickets for ${event?.title || 'the Event'} are Confirmed`
+      subject =
+        depositCount > 0
+          ? `Your ${depositCount > 1 ? `${depositCount} tables are` : 'table is'} reserved for ${event?.title || 'the event'}`
+          : `Your Tickets for ${event?.title || 'the Event'} are Confirmed`
     }
 
     await resend.emails.send({

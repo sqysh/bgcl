@@ -12,7 +12,7 @@ type OrderItem = {
   raffleTicketCode?: string | null
 }
 
-export const TicketsGrid = ({ order }: { order: any }) => {
+export const TicketsGrid = ({ order, isDeposit }: { order: any; isDeposit?: boolean }) => {
   const items: OrderItem[] = order?.orderItems ?? []
 
   if (items.length === 0) return null
@@ -27,7 +27,9 @@ export const TicketsGrid = ({ order }: { order: any }) => {
       transition={{ duration: 0.4 }}
       className="pt-4 mb-8 border-t border-neutral-200 dark:border-neutral-800"
     >
-      <h2 className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-3">Tickets</h2>
+      <h2 className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-3">
+        {isDeposit ? 'Reserved' : 'Tickets'}
+      </h2>
 
       <ul role="list" className="divide-y divide-neutral-100 dark:divide-neutral-900 list-none p-0 m-0">
         {items.map((item) => (

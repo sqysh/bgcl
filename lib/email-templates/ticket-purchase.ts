@@ -11,6 +11,7 @@ export const ticketPurchaseTemplate = (
     name: string
     quantity: number
     price: number
+    isDeposit?: boolean
   }>,
   totalAmount: number,
   feesCovered: number,
@@ -18,13 +19,34 @@ export const ticketPurchaseTemplate = (
 ) => {
   const subtotal = tickets.reduce((sum, ticket) => sum + ticket.price * ticket.quantity, 0)
 
+  // A deposit holds a table rather than admitting anyone, and only covers part
+  // of the price, so the whole email reads differently
+  const depositCount = tickets.reduce((sum, ticket) => sum + (ticket.isDeposit ? ticket.quantity : 0), 0)
+  const isDeposit = depositCount > 0
+
+  const tables = depositCount > 1 ? `${depositCount} tables are` : 'table is'
+
+  const subject = isDeposit ? 'Table reservation' : 'Ticket confirmation'
+
+  const greeting = isDeposit
+    ? `Your ${tables} reserved, ${buyerName}. We look forward to seeing you.`
+    : `Your tickets are confirmed, ${buyerName}. We look forward to seeing you.`
+
+  const whatsNext = isDeposit
+    ? `Your ${tables} held. This deposit is credited toward the table price, and we will invoice the balance closer to
+       the event. Deposits are non-refundable. Your payment history is saved to your account at
+       <a href="https://bgcl.org" style="color: #1a72b8; text-decoration: none;">bgcl.org</a>.`
+    : `Your purchase history is saved to your account at
+       <a href="https://bgcl.org" style="color: #1a72b8; text-decoration: none;">bgcl.org</a>.
+       Tickets will be mailed to the address you provided at checkout.`
+
   return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ticket confirmation - Boys &amp; Girls Club of Lynn</title>
+  <title>${subject} - Boys &amp; Girls Club of Lynn</title>
 </head>
 <body style="margin: 0; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #ffffff;">
   <div style="max-width: 520px; margin: 0 auto;">
@@ -35,13 +57,13 @@ export const ticketPurchaseTemplate = (
         Boys &amp; Girls Club of Lynn
       </p>
       <p style="margin: 2px 0 0 0; color: #737373; font-size: 13px;">
-        Ticket confirmation
+        ${subject}
       </p>
     </div>
 
     <!-- Greeting -->
     <p style="margin: 24px 0 0 0; color: #171717; font-size: 15px; line-height: 1.6;">
-      Your tickets are confirmed, ${buyerName}. We look forward to seeing you.
+      ${greeting}
     </p>
 
     <!-- Event -->
@@ -59,7 +81,7 @@ export const ticketPurchaseTemplate = (
     <!-- Order -->
     <div style="margin-top: 28px; padding-top: 16px; border-top: 1px solid #e5e5e5;">
       <p style="margin: 0 0 12px 0; color: #737373; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em;">
-        Your order
+        ${isDeposit ? 'Reserved' : 'Your order'}
       </p>
 
       <table style="width: 100%; border-collapse: collapse;">
@@ -109,7 +131,7 @@ export const ticketPurchaseTemplate = (
 
         <tr>
           <td style="padding: 12px 0 0 0; color: #171717; font-size: 14px; font-weight: 600;">
-            Total paid
+            ${isDeposit ? 'Deposit paid' : 'Total paid'}
           </td>
           <td style="padding: 12px 0 0 0; text-align: right; color: #171717; font-size: 18px; font-weight: 600; white-space: nowrap;">
             ${formatCents(totalAmount)}
@@ -128,9 +150,7 @@ export const ticketPurchaseTemplate = (
         What's next
       </p>
       <p style="margin: 0; color: #737373; font-size: 13px; line-height: 1.7;">
-        Your purchase history is saved to your account at
-        <a href="https://bgcl.org" style="color: #1a72b8; text-decoration: none;">bgcl.org</a>.
-        Tickets will be mailed to the address you provided at checkout.
+        ${whatsNext}
       </p>
     </div>
 

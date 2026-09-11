@@ -18,12 +18,23 @@ export default function OrderConfirmationClient({ order }: { order: IOrder }) {
   const isRecurring = order?.type === 'RECURRING_DONATION'
   const isTicket = order?.type === 'TICKET_PURCHASE'
 
+  const depositCount =
+    order?.orderItems?.filter((item) => item.ticket?.ticketType === 'DEPOSIT').reduce((sum, item) => sum + item.quantity, 0) ?? 0
+
+  const isDeposit = depositCount > 0
+
   const address = (order?.billingAddress ?? null) as Record<string, string | null> | null
   const event = order?.event
 
   const clearCart = useCartStore((s) => s.clearCart)
 
-  const label = isDonation ? (isRecurring ? `${order.recurringFrequency} donation` : 'One-time donation') : 'Ticket purchase'
+  const label = isDeposit
+    ? 'Table deposit'
+    : isDonation
+      ? isRecurring
+        ? `${order.recurringFrequency} donation`
+        : 'One-time donation'
+      : 'Ticket purchase'
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -35,7 +46,7 @@ export default function OrderConfirmationClient({ order }: { order: IOrder }) {
       <ConfirmationHeader />
 
       <div className="flex-1 max-w-4xl w-full mx-auto px-6 py-8 lg:px-8 lg:py-12">
-        <ConfirmationHero isDonation={isDonation} />
+        <ConfirmationHero isDonation={isDonation} isDeposit={isDeposit} depositCount={depositCount} />
 
         <div className="space-y-8">
           <motion.div
@@ -55,6 +66,23 @@ export default function OrderConfirmationClient({ order }: { order: IOrder }) {
               {formatDate(order?.paidAt || order?.createdAt, true)}
             </p>
           </motion.div>
+
+          {isDeposit && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.08 }}
+              className="pt-4 border-t border-neutral-200 dark:border-neutral-800"
+            >
+              <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                What happens next
+              </p>
+              <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+                Your table is held. This deposit is credited toward the table price, and we will invoice the balance closer to the
+                event. Deposits are non-refundable.
+              </p>
+            </motion.div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8">
             <Section title="Customer">
@@ -150,7 +178,7 @@ export default function OrderConfirmationClient({ order }: { order: IOrder }) {
             )}
           </div>
 
-          {isTicket && <TicketsGrid order={order} />}
+          {isTicket && <TicketsGrid order={order} isDeposit={isDeposit} />}
 
           <motion.div
             initial={{ opacity: 0, y: 8 }}

@@ -33,7 +33,12 @@ export const getOrder = async (id: string) => {
             totalPrice: true,
             raffleTicketCode: true,
             raffleTicketNumber: true,
-            ticketDescription: true
+            ticketDescription: true,
+            ticket: {
+              select: {
+                ticketType: true
+              }
+            }
           }
         }
       }

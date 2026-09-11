@@ -19,6 +19,8 @@ import {
   ticketCheckoutSchema
 } from '@/lib/validations/ticket-checkout.validation'
 import { TicketCheckoutShell } from './_components/TicketCheckoutShell'
+import { useCartStore } from '@/stores/useCartStore'
+import { EmptyState } from './_components/TicketCheckoutEmptyState'
 
 type Props = {
   savedCards: PaymentMethod[]
@@ -43,6 +45,8 @@ export function TicketCheckoutClient({
   showAttendingToggle
 }: Props) {
   const router = useRouter()
+  const hasHydrated = useCartStore((s) => s.hasHydrated)
+  const items = useCartStore((s) => s.items)
 
   const hasUserInfo = Boolean(userName && userAddress && userPhone)
 
@@ -110,6 +114,8 @@ export function TicketCheckoutClient({
       setSaveError('We could not save your details. Please try again.')
     }
   }
+
+  if (hasHydrated && items.length === 0) return <EmptyState />
 
   return (
     <FormProvider {...methods}>
