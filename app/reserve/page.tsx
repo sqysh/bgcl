@@ -1,6 +1,8 @@
 import { getReservationTicket } from '@/lib/actions/ticket/getReservationTicket'
 import { ReserveClient } from './ReserveClient'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ReservePage() {
   const result = await getReservationTicket()
   const ticket = result.data
