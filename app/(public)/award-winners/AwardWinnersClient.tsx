@@ -85,7 +85,7 @@ const AwardWinnersClient = ({ newsAndTeamMembers, pageData, programs }) => {
                         src={item.image}
                         alt={item.name}
                         priority={true}
-                        className="object-cover group-hover:scale-105 transition-transform duration-300 w-full h-full"
+                        className="object-contain group-hover:scale-105 transition-transform duration-300 w-full h-full"
                       />
                     </div>
 
@@ -153,10 +153,7 @@ const AwardWinnersClient = ({ newsAndTeamMembers, pageData, programs }) => {
         </section>
 
         {/* Helping Hands Business of the Year Section */}
-        <section
-          className="py-20 px-6 md:px-12 dark:bg-neutral-900/50 bg-neutral-50"
-          aria-labelledby="helping-hands-heading"
-        >
+        <section className="py-20 px-6 md:px-12 dark:bg-neutral-900/50 bg-neutral-50" aria-labelledby="helping-hands-heading">
           <div className="max-w-334 mx-auto">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
