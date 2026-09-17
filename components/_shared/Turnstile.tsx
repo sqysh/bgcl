@@ -44,6 +44,8 @@ export function Turnstile({
         sitekey: siteKey,
         action,
         theme: 'auto',
+        appearance: 'interaction-only',
+        size: 'flexible',
         callback: (token: string) => onToken(token),
         'expired-callback': () => onToken(null),
         'error-callback': () => onToken(null)

@@ -36,13 +36,7 @@ export const adminNavigationLinkData = (path: string, role?: Role): { title: str
     active: path === childPath
   })
 
-  const item = (
-    icon: LucideIcon,
-    label: string,
-    itemPath: string,
-    children?: NavChild[],
-    section?: string
-  ): NavItem => ({
+  const item = (icon: LucideIcon, label: string, itemPath: string, children?: NavChild[], section?: string): NavItem => ({
     icon,
     label,
     path: itemPath,
@@ -92,21 +86,22 @@ export const adminNavigationLinkData = (path: string, role?: Role): { title: str
         item(
           Pencil,
           'Page Editor',
-          '/admin/page/home',
+          '/admin/page-editor/home',
           [
-            child('Home', '/admin/page/home'),
-            child('About', '/admin/page/about'),
-            child('Team', '/admin/page/team'),
-            child('Programs', '/admin/page/programs'),
-            child('Campaigns', '/admin/page/campaigns'),
-            child('Events', '/admin/page/events'),
-            child('Award Winners', '/admin/page/award-winners'),
-            child('Latest News', '/admin/page/latest-news'),
-            child('Partnerships', '/admin/page/partnerships'),
-            child('Get Involved', '/admin/page/get-involved'),
-            child('Contact', '/admin/page/contact'),
-            child('Capital Campaign', '/admin/page/capital-campaign'),
-            child('CIT Application', '/admin/page/cit-application')
+            child('Home', '/admin/page-editor/home'),
+            child('About', '/admin/page-editor/about'),
+            child('Team', '/admin/page-editor/team'),
+            child('Programs', '/admin/page-editor/programs'),
+            child('Campaigns', '/admin/page-editor/campaigns'),
+            child('Events', '/admin/page-editor/events'),
+            child('Award Winners', '/admin/page-editor/award-winners'),
+            child('Latest News', '/admin/page-editor/latest-news'),
+            child('Partnerships', '/admin/page-editor/partnerships'),
+            child('Get Involved', '/admin/page-editor/get-involved'),
+            child('Contact', '/admin/page-editor/contact'),
+            child('Capital Campaign', '/admin/page-editor/capital-campaign'),
+            child('CIT Application', '/admin/page-editor/cit-application'),
+            child('Holiday Giving', '/admin/page-editor/holiday-giving')
           ],
           '/admin/page'
         ),

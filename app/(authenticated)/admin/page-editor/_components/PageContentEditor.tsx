@@ -28,6 +28,7 @@ export function PageContentEditor({ fields, onSave, isLoading, message, onDismis
       </div>
     )
   }
+
   const sections = Array.from(new Set(content.map((f) => f.section)))
 
   const updateField = (id: string, newValue: string | string[]) => {
@@ -35,13 +36,16 @@ export function PageContentEditor({ fields, onSave, isLoading, message, onDismis
   }
 
   return (
-    <div className="min-h-[calc(100dvh-123px)] flex flex-col md:flex-row bg-white dark:bg-neutral-950">
+    // A fixed height rather than a minimum, so the editor column is exactly the
+    // space available and its footer has something to sit against. On mobile
+    // the two panels stack and the page scrolls normally.
+    <div className="md:h-dvh md:overflow-hidden flex flex-col md:flex-row bg-white dark:bg-neutral-950">
       {/* Editor */}
       <div
-        className={`${isPreviewVisible ? 'md:w-1/2' : 'w-full'} flex flex-col border-r dark:border-neutral-800 border-neutral-200`}
+        className={`${isPreviewVisible ? 'md:w-1/2' : 'w-full'} flex flex-col md:min-h-0 border-r dark:border-neutral-800 border-neutral-200`}
       >
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* Scrollable content */}
+        <div className="flex-1 md:overflow-y-auto md:min-h-0 p-6">
           {sections.map((section) => (
             <Section key={section} title={section}>
               {content
@@ -53,25 +57,27 @@ export function PageContentEditor({ fields, onSave, isLoading, message, onDismis
           ))}
         </div>
 
-        {/* Footer - Fixed at Bottom */}
+        {/* Footer, pinned to the bottom of the column */}
         <div className="shrink-0 bg-neutral-100 dark:bg-neutral-900 border-t dark:border-neutral-800 border-neutral-200 px-6 py-4">
           <InlineMessage state={message ?? null} onDismiss={onDismissMessage} className="mb-3" />
 
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:justify-end">
             <button
+              type="button"
               onClick={() => setIsPreviewVisible(!isPreviewVisible)}
               className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white rounded-lg border border-neutral-300 dark:border-neutral-700 transition-colors w-full md:w-fit"
             >
               {isPreviewVisible ? <EyeOff size={16} /> : <Eye size={16} />}
-              {isPreviewVisible ? 'Hide' : 'Show'} Preview
+              {isPreviewVisible ? 'Hide' : 'Show'} preview
             </button>
 
             <button
+              type="button"
               onClick={() => onSave(content)}
               disabled={isLoading}
               className="px-6 py-2 text-sm font-medium bg-sky-600 hover:bg-sky-700 disabled:bg-sky-600/50 disabled:cursor-not-allowed text-white rounded-lg transition-colors w-full md:w-fit"
             >
-              {isLoading ? 'Saving...' : 'Save Changes'}
+              {isLoading ? 'Saving…' : 'Save changes'}
             </button>
           </div>
         </div>

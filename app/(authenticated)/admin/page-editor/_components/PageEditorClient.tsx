@@ -1,13 +1,22 @@
+// app/(authenticated)/admin/page-editor/_components/PageEditorClient.tsx
 'use client'
 
+import { useState } from 'react'
+import { PageContentEditor } from './PageContentEditor'
 import { createPage } from '@/lib/actions/page/createPage'
 import { updatePageBySlug } from '@/lib/actions/page/updatePageBySlug'
-import { useState } from 'react'
-import { PageContentEditor } from '../_components/PageContentEditor'
-import extractErrorMessage from '@/lib/utils/extractErrorMessage'
 import { InlineMessageState } from '@/components/_shared/InlineMessage'
+import extractErrorMessage from '@/lib/utils/extractErrorMessage'
 
-export const PageEditorAboutClient = ({ data }) => {
+type Props = {
+  /** The page's slug, e.g. "home" or "holiday-giving" */
+  slug: string
+  data: { id?: string; content?: unknown } | null
+  /** Used when the page has never been created, so there is nothing to load */
+  fallbackContent?: unknown
+}
+
+export function PageEditorClient({ slug, data, fallbackContent }: Props) {
   const [isSaving, setIsSaving] = useState(false)
   const [message, setMessage] = useState<InlineMessageState | null>(null)
 
@@ -18,7 +27,7 @@ export const PageEditorAboutClient = ({ data }) => {
     const isUpdate = Boolean(data?.id)
 
     try {
-      const res = isUpdate ? await updatePageBySlug('about', content) : await createPage('about', content)
+      const res = isUpdate ? await updatePageBySlug(slug, content) : await createPage(slug, content)
 
       if (res && res.success === false) {
         setMessage({
@@ -34,7 +43,7 @@ export const PageEditorAboutClient = ({ data }) => {
         message: isUpdate ? 'Changes saved successfully' : 'Page created successfully',
         description: isUpdate
           ? 'Visitors will see the updated content immediately'
-          : 'Your about page is now accessible to all visitors'
+          : `Your page is now accessible to all visitors`
       })
     } catch (error: unknown) {
       setMessage({
@@ -49,7 +58,7 @@ export const PageEditorAboutClient = ({ data }) => {
 
   return (
     <PageContentEditor
-      fields={data?.content}
+      fields={(data?.content ?? fallbackContent) as never}
       onSave={handleSave}
       isLoading={isSaving}
       message={message}

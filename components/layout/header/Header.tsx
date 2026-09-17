@@ -40,6 +40,8 @@ const getVisibilityClass = (priority: number) => {
       return 'hidden xl-2:block' // visible from 1380px
     case 7:
       return 'hidden 2xl:block' // visible from 1536px — first to disappear
+    case 8:
+      return 'hidden 3xl:block' // visible from 1536px — first to disappear
     default:
       return 'hidden lg:block'
   }

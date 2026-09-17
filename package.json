@@ -8,7 +8,9 @@
     "build": "npm run generate && next build",
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "generate": "prisma generate"
+    "generate": "prisma generate",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run build"
   },
   "overrides": {
     "postcss": "^8.5.10",

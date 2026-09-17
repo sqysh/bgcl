@@ -3,7 +3,7 @@ export interface PageField {
   section: string // Which section it belongs to (for grouping)
   label: string // Display name
   value: string | string[] // The actual content
-  type: 'text' | 'textarea' | 'url' | 'array' | 'boolean'
+  type: 'boolean' | 'text' | 'textarea' | 'url' | 'array' | 'image'
 }
 
 /**
