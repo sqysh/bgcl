@@ -144,16 +144,10 @@ export default function RegistrationModal({ modal }) {
                     transition={{ delay: 0.3, duration: 0.5 }}
                     className="text-center mb-6"
                   >
-                    <h2
-                      id="registration-modal-heading"
-                      className="text-2xl font-bold text-neutral-900 dark:text-white mb-3"
-                    >
+                    <h2 id="registration-modal-heading" className="text-2xl font-bold text-neutral-900 dark:text-white mb-3">
                       {modal?.heading}
                     </h2>
-                    <p
-                      id="registration-modal-description"
-                      className="text-neutral-600 dark:text-neutral-400 leading-relaxed"
-                    >
+                    <p id="registration-modal-description" className="text-neutral-600 dark:text-neutral-400 leading-relaxed">
                       {modal?.subheading}
                     </p>
                   </motion.div>
@@ -197,16 +191,6 @@ export default function RegistrationModal({ modal }) {
                       {modal?.button2Text ?? 'Maybe later'}
                     </motion.button>
                   </motion.div>
-
-                  {/* Footer note */}
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5, duration: 0.5 }}
-                    className="text-center text-sm text-neutral-500 dark:text-neutral-500 mt-6"
-                  >
-                    Quick and easy enrollment • Takes less than 15 minutes
-                  </motion.p>
                 </div>
               </div>
             </motion.div>
