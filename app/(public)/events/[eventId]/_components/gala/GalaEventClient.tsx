@@ -11,11 +11,12 @@ import { useCartCount, useCartTotal } from '@/stores/useCartStore'
 import { formatCurrency } from '@/lib/utils/currency.utils'
 import Link from 'next/link'
 
-/** For sections below the fold — plays once, when scrolled to. */
 const enterOnView = {
   initial: { opacity: 0, y: 32 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.25 },
+  // A fraction rather than a pixel amount, so a section taller than four
+  // screens on mobile can still cross the threshold
+  viewport: { once: true, amount: 0.1 },
   transition: { duration: 0.7, ease: EASE }
 }
 
@@ -39,10 +40,7 @@ export function GalaEventClient({ data: event }) {
               <span className="font-bold">{cartCount}</span> selected
               <span className="ml-2 text-white/50">{formatCurrency(total)}</span>
             </p>
-            <Link
-              href="/checkout"
-              className="rounded-md bg-[#9b1b3c] px-6 py-2.5 text-xs font-bold uppercase tracking-[0.18em]"
-            >
+            <Link href="/checkout" className="rounded-md bg-[#9b1b3c] px-6 py-2.5 text-xs font-bold uppercase tracking-[0.18em]">
               Checkout
             </Link>
           </div>
@@ -69,9 +67,7 @@ export function GalaEventClient({ data: event }) {
             <GalaVideoBand className="h-72 lg:h-100">
               <motion.div {...enterOnView} className="grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-end">
                 <h2 className="text-6xl font-black uppercase tracking-tight sm:text-7xl lg:text-8xl">Tickets</h2>
-                {event.tagline && (
-                  <p className="max-w-sm text-sm leading-relaxed text-white/70 lg:pb-3">{event.tagline}</p>
-                )}
+                {event.tagline && <p className="max-w-sm text-sm leading-relaxed text-white/70 lg:pb-3">{event.tagline}</p>}
               </motion.div>
             </GalaVideoBand>
 
