@@ -6,7 +6,6 @@ import type { ProgramFormInput } from '@/lib/validations/program.validation'
 import type { Theme } from '@prisma/client'
 import BasicInformation from './BasicInformation'
 import ProgramDetails from './ProgramDetails'
-import ImageUpload from '@/components/_shared/ImageUpload'
 import Schedule from './Schedule'
 import { AdditionalInformation } from './AdditionalInformation'
 import { AdditionalDetails } from './AdditionalDetails'
@@ -15,13 +14,22 @@ import { FormSwitch } from '@/components/_shared/FormSwitch'
 import PDFSection from './PDFSection'
 import TopBar from './TopBar'
 import { AlertCircle } from 'lucide-react'
+import { MultiImageUpload } from '@/components/_shared/MultiImageUpload'
 
 export default function ProgramForm({ isUpdating, themes }: { isUpdating: boolean; themes: Theme[] }) {
   const {
+    watch,
+    setValue,
     formState: { isSubmitting, errors }
   } = useFormContext<ProgramFormInput>()
 
   const close = useProgramDrawer((s) => s.close)
+
+  const images = (watch('images') ?? []).map((image, index) => ({
+    ...image,
+    isPrimary: image.isPrimary ?? false,
+    order: image.order ?? index
+  }))
 
   return (
     <div className="flex flex-col h-full bg-neutral-100 dark:bg-neutral-900">
@@ -51,10 +59,7 @@ export default function ProgramForm({ isUpdating, themes }: { isUpdating: boolea
           <div className="mb-8">
             <h3 className="text-base font-semibold text-neutral-900 dark:text-white mb-4">Images</h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <ImageUpload fieldName="image" label="Primary Image" />
-              <ImageUpload fieldName="imageTwo" label="Secondary Image" />
-            </div>
+            <MultiImageUpload images={images} onChange={(next) => setValue('images', next, { shouldDirty: true, shouldValidate: true })} />
           </div>
 
           {/* Schedule */}

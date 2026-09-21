@@ -1,43 +1,39 @@
-import { ProgramDetailsClient } from '@/app/(public)/programs/[id]/ProgramDetailsClient'
+import { PublicProgramDetailsClient } from '@/app/(public)/programs/[id]/PublicProgramDetailsClient'
 import { getClosings } from '@/lib/actions/closing/getClosings'
 import { getProgramById } from '@/lib/actions/program/getProgramById'
 import { ProgramFormValues } from '@/lib/validations/program.validation'
 import prisma from '@/prisma/client'
-import { redirect } from 'next/navigation'
+import { permanentRedirect } from 'next/navigation'
 
-export default async function ProgramDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+const GRADIENTS = [
+  'from-sky-500 to-cyan-600',
+  'from-purple-500 to-indigo-600',
+  'from-green-500 to-emerald-600',
+  'from-orange-500 to-orange-600'
+]
+
+export default async function PublicProgramDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const programResult = await getProgramById(id)
-  const closingsResult = await getClosings()
 
-  // If not found by ID, try to find by slug/name (old URL structure)
+  const [programResult, closingsResult] = await Promise.all([getProgramById(id), getClosings()])
+
+  // old slug URLs, e.g. /programs/camp-creighton
   if (!programResult.data) {
-    // Convert slug back to readable name: "camp-creighton" -> "camp creighton"
-    const programName = id.replace(/-/g, ' ')
-
     const programBySlug = await prisma.program.findFirst({
-      where: {
-        name: {
-          contains: programName,
-          mode: 'insensitive'
-        }
-      }
+      where: { name: { contains: id.replace(/-/g, ' '), mode: 'insensitive' } },
+      select: { id: true }
     })
 
-    if (programBySlug) {
-      // Permanently redirect to the correct ID-based URL
-      redirect(`/programs/${programBySlug.id}`)
-    }
+    if (programBySlug) permanentRedirect(`/programs/${programBySlug.id}`)
   }
-
   const normalizedProgram: ProgramFormValues = {
     ...programResult.data,
     ...(programResult.data?.descriptions && {
-      descriptions: Array.isArray(programResult.data?.descriptions)
-        ? (programResult.data?.descriptions as string[])
-        : []
+      descriptions: Array.isArray(programResult.data?.descriptions) ? (programResult.data?.descriptions as string[]) : []
     })
   }
 
-  return <ProgramDetailsClient program={normalizedProgram} closings={closingsResult.data} />
+  const gradient = GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)]
+
+  return <PublicProgramDetailsClient program={normalizedProgram} closings={closingsResult.data} gradient={gradient} />
 }

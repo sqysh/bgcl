@@ -4,7 +4,8 @@ import { createLog } from '../log/createLog'
 export const getProgramById = async (id: string) => {
   try {
     const program = await prisma.program.findUnique({
-      where: { id }
+      where: { id },
+      include: { images: { orderBy: { order: 'asc' } } }
     })
 
     if (!program) return { success: false, data: null, error: null }

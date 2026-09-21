@@ -4,22 +4,21 @@ import { motion } from 'framer-motion'
 import { ChevronLeft, Clock, Users, Calendar, MapPin, FileText, Stamp } from 'lucide-react'
 import Link from 'next/link'
 import FacilityClosings from '@/components/_shared/FacilityClosings'
-import { useMemo } from 'react'
 import Picture from '@/components/_shared/Picture'
 import { Closing } from '@/types/closing.types'
-import { Program } from '@prisma/client'
 import { ProgramFormValues } from '@/lib/validations/program.validation'
+import { ProgramGallery } from './_components/ProgramGallery'
 
-export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFormValues; closings: Closing[] }) => {
-  const gradient = useMemo(() => {
-    const gradients = [
-      'from-sky-500 to-cyan-600',
-      'from-purple-500 to-indigo-600',
-      'from-green-500 to-emerald-600',
-      'from-orange-500 to-orange-600'
-    ]
-    return gradients[Math.floor(Math.random() * gradients.length)]
-  }, [])
+export const PublicProgramDetailsClient = ({
+  program,
+  closings,
+  gradient
+}: {
+  program: ProgramFormValues
+  closings: Closing[]
+  gradient: string
+}) => {
+  const primaryImage = program.images.find((i) => i.isPrimary)
 
   if (Object.keys(program).length === 0) {
     return (
@@ -69,9 +68,7 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
         </div>
         <div className="max-w-334 mx-auto px-4 sm:px-6 md:px-12 relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white drop-shadow-lg">
-              {program?.name}
-            </h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white drop-shadow-lg">{program?.name}</h1>
           </motion.div>
         </div>
       </div>
@@ -91,9 +88,7 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
                   About This Program
                 </h2>
                 <div className="space-y-3 sm:space-y-4 text-base sm:text-lg dark:text-neutral-300 text-neutral-700 leading-relaxed">
-                  {program?.descriptions?.map(
-                    (description: string, index: number) => description && <p key={index}>{description}</p>
-                  )}
+                  {program?.descriptions?.map((description: string, index: number) => description && <p key={index}>{description}</p>)}
                 </div>
               </div>
             </section>
@@ -145,18 +140,11 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
                       Weekly Themes
                     </h2>
                   </div>
-                  <ul
-                    aria-label="Weekly themes list"
-                    className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 list-none p-0"
-                  >
+                  <ul aria-label="Weekly themes list" className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 list-none p-0">
                     {program.themes
                       .sort((a: { order: number }, b: { order: number }) => a.order - b.order)
                       .map((theme: { id: string; title: string; dates: string; order: number }, index: number) => {
-                        const colors = [
-                          { badge: 'bg-purple-500' },
-                          { badge: 'bg-orange-500' },
-                          { badge: 'bg-green-500' }
-                        ]
+                        const colors = [{ badge: 'bg-purple-500' }, { badge: 'bg-orange-500' }, { badge: 'bg-green-500' }]
                         const colorScheme = colors[index % 3]
 
                         return (
@@ -193,35 +181,20 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
                 >
                   <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                     <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-sky-500" aria-hidden="true" />
-                    <h2
-                      id="additional-details-heading"
-                      className="text-base sm:text-lg font-bold dark:text-white text-neutral-900"
-                    >
+                    <h2 id="additional-details-heading" className="text-base sm:text-lg font-bold dark:text-white text-neutral-900">
                       Additional Details
                     </h2>
                   </div>
                   <div className="space-y-4 sm:space-y-6">
-                    {program.additionalDetails.map(
-                      (detail: { title: string; input1: string; input2: string }, index: number) => (
-                        <div key={index} className="border-l-4 border-sky-500 pl-3 sm:pl-4">
-                          <h3 className="text-sm sm:text-base font-bold dark:text-white text-neutral-900 mb-2 sm:mb-3">
-                            {detail.title}
-                          </h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
-                            {detail.input1 && (
-                              <p className="dark:text-neutral-300 text-neutral-700 text-sm sm:text-base">
-                                {detail.input1}
-                              </p>
-                            )}
-                            {detail.input2 && (
-                              <p className="dark:text-neutral-300 text-neutral-700 text-sm sm:text-base">
-                                {detail.input2}
-                              </p>
-                            )}
-                          </div>
+                    {program.additionalDetails.map((detail: { title: string; input1: string; input2: string }, index: number) => (
+                      <div key={index} className="border-l-4 border-sky-500 pl-3 sm:pl-4">
+                        <h3 className="text-sm sm:text-base font-bold dark:text-white text-neutral-900 mb-2 sm:mb-3">{detail.title}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
+                          {detail.input1 && <p className="dark:text-neutral-300 text-neutral-700 text-sm sm:text-base">{detail.input1}</p>}
+                          {detail.input2 && <p className="dark:text-neutral-300 text-neutral-700 text-sm sm:text-base">{detail.input2}</p>}
                         </div>
-                      )
-                    )}
+                      </div>
+                    ))}
                   </div>
                 </section>
               )}
@@ -237,7 +210,7 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="dark:bg-neutral-900 dark:border-neutral-800 bg-neutral-50 border-neutral-200 border rounded-lg p-4 sm:p-6 space-y-3 sm:space-y-4 lg:sticky lg:top-8"
+                className="dark:bg-neutral-900 dark:border-neutral-800 bg-neutral-50 border-neutral-200 border rounded-lg p-4 sm:p-6 space-y-3 sm:space-y-4 lg:top-8"
               >
                 <h2
                   id="schedule-heading"
@@ -263,8 +236,7 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
               </motion.section>
             )}
 
-            {/* Program Image */}
-            {program?.image && (
+            {primaryImage && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -272,28 +244,11 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
                 className="relative w-full aspect-square rounded-lg overflow-hidden shadow-lg"
               >
                 <Picture
-                  src={program.image}
+                  src={primaryImage.url}
                   alt={`${program.name} program photo`}
                   priority
                   sizes="(max-width: 1024px) 100vw, 33vw"
-                  className="object-cover w-full h-full"
-                />
-              </motion.div>
-            )}
-            {/* Program Image 2*/}
-            {program?.imageTwo && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-                className="relative w-full aspect-square rounded-lg overflow-hidden shadow-lg"
-              >
-                <Picture
-                  src={program.imageTwo}
-                  alt={`${program.name} program photo`}
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 33vw"
-                  className="object-cover w-full h-full"
+                  className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
                 />
               </motion.div>
             )}
@@ -309,10 +264,7 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
               >
                 Enroll Now
               </a>
-              <p
-                className="text-[10px] sm:text-xs dark:text-neutral-500 text-neutral-500 mt-2 text-center"
-                aria-hidden="true"
-              >
+              <p className="text-[10px] sm:text-xs dark:text-neutral-500 text-neutral-500 mt-2 text-center" aria-hidden="true">
                 Opens in new window
               </p>
             </motion.div>
@@ -325,16 +277,11 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
               >
                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <Users className="w-5 h-5 sm:w-6 sm:h-6 text-sky-500" aria-hidden="true" />
-                  <h2
-                    id="age-group-heading"
-                    className="text-base sm:text-lg font-bold dark:text-white text-neutral-900"
-                  >
+                  <h2 id="age-group-heading" className="text-base sm:text-lg font-bold dark:text-white text-neutral-900">
                     Age Group
                   </h2>
                 </div>
-                <p className="dark:text-neutral-300 text-neutral-700 text-base sm:text-lg font-semibold">
-                  {program.ageGroup} years
-                </p>
+                <p className="dark:text-neutral-300 text-neutral-700 text-base sm:text-lg font-semibold">{program.ageGroup} years</p>
               </div>
             )}
 
@@ -350,9 +297,7 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
                     Location
                   </h2>
                 </div>
-                <p className="dark:text-neutral-300 text-neutral-700 text-base sm:text-lg font-semibold">
-                  {program.location}
-                </p>
+                <p className="dark:text-neutral-300 text-neutral-700 text-base sm:text-lg font-semibold">{program.location}</p>
               </div>
             )}
 
@@ -368,9 +313,7 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
                     Available Dates
                   </h2>
                 </div>
-                <p className="dark:text-neutral-300 text-neutral-700 text-base sm:text-lg font-semibold">
-                  {program.datesAvailable}
-                </p>
+                <p className="dark:text-neutral-300 text-neutral-700 text-base sm:text-lg font-semibold">{program.datesAvailable}</p>
               </div>
             )}
 
@@ -386,9 +329,7 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
                     Licensing
                   </h2>
                 </div>
-                <p className="dark:text-neutral-300 text-neutral-700 text-base sm:text-lg font-semibold">
-                  {program.license}
-                </p>
+                <p className="dark:text-neutral-300 text-neutral-700 text-base sm:text-lg font-semibold">{program.license}</p>
               </div>
             )}
 
@@ -400,10 +341,7 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
               >
                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-sky-500" aria-hidden="true" />
-                  <h2
-                    id="program-docs-heading"
-                    className="text-base sm:text-lg font-bold dark:text-white text-neutral-900"
-                  >
+                  <h2 id="program-docs-heading" className="text-base sm:text-lg font-bold dark:text-white text-neutral-900">
                     Program Details
                   </h2>
                 </div>
@@ -416,13 +354,7 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
                   className="inline-flex items-center gap-2 dark:text-sky-400 text-sky-600 hover:text-sky-700 dark:hover:text-sky-300 text-base sm:text-lg font-semibold transition-colors duration-200 underline underline-offset-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
                 >
                   View PDF Document
-                  <svg
-                    aria-hidden="true"
-                    className="w-4 h-4 sm:w-5 sm:h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg aria-hidden="true" className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -465,6 +397,8 @@ export const ProgramDetailsClient = ({ program, closings }: { program: ProgramFo
             </motion.section>
           </aside>
         </motion.div>
+
+        <ProgramGallery images={program.images ?? []} name={program.name} />
       </div>
 
       <FacilityClosings closings={closings} />

@@ -12,6 +12,7 @@ interface PictureProps {
   sizes?: string
   role?: string
   decorative?: boolean
+  loading?: 'eager' | 'lazy'
 }
 
 const Picture: FC<PictureProps> = ({
@@ -24,7 +25,8 @@ const Picture: FC<PictureProps> = ({
   height,
   sizes = '100vw',
   role,
-  decorative = false
+  decorative = false,
+  loading
 }) => {
   // Decorative images must have empty alt and aria-hidden
   // If decorative prop is passed, override whatever alt was given
@@ -40,7 +42,7 @@ const Picture: FC<PictureProps> = ({
       height={height || 1}
       className={className}
       priority={priority}
-      loading={priority ? 'eager' : 'lazy'}
+      loading={loading ?? (priority ? 'eager' : 'lazy')}
       sizes={sizes}
       unoptimized
       role={role}

@@ -8,16 +8,9 @@ import { Resource } from '@/types/resource.types'
 import { Program } from '@prisma/client'
 import Picture from '@/components/_shared/Picture'
 
-export const ProgramsClient = ({
-  programs,
-  resources,
-  pageData
-}: {
-  programs: Program[]
-  resources: Resource[]
-  pageData: any
-}) => {
+export function PublicProgramsClient({ programs, resources, pageData }: { programs: Program[]; resources: Resource[]; pageData: any }) {
   const t = pageData?.sections?.programs
+
   return (
     <main id="main-content" className="py-12 sm:py-16 md:py-20">
       <div className="max-w-334 mx-auto space-y-12 sm:space-y-16 px-4 sm:px-6 md:px-12">
@@ -42,15 +35,10 @@ export const ProgramsClient = ({
         {/* Programs Grid */}
         {programs.length === 0 ? (
           <div role="status" className="text-center py-12 sm:py-20">
-            <p className="dark:text-neutral-400 text-neutral-600 text-base sm:text-lg">
-              No programs available at the moment.
-            </p>
+            <p className="dark:text-neutral-400 text-neutral-600 text-base sm:text-lg">No programs available at the moment.</p>
           </div>
         ) : (
-          <ul
-            aria-label="Available programs"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 list-none p-0"
-          >
+          <ul aria-label="Available programs" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 list-none p-0">
             {programs.map((program: Program, index: number) => (
               <motion.li
                 key={program.id}
@@ -82,9 +70,7 @@ export const ProgramsClient = ({
 
                     {/* Content */}
                     <div className="p-4 sm:p-6 flex-1 flex flex-col">
-                      <h2 className="text-lg sm:text-xl font-bold dark:text-white text-neutral-900 mb-2">
-                        {program.name}
-                      </h2>
+                      <h2 className="text-lg sm:text-xl font-bold dark:text-white text-neutral-900 mb-2">{program.name}</h2>
                       <p className="dark:text-neutral-400 text-neutral-600 text-xs sm:text-sm mb-3 sm:mb-4 flex-1 line-clamp-3">
                         {program.descriptions[0]}
                       </p>
@@ -119,10 +105,7 @@ export const ProgramsClient = ({
       >
         <div className="mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 sm:space-y-8 flex items-center justify-center flex-col">
           <div className="space-y-3 sm:space-y-4">
-            <h2
-              id="summer-programs-heading"
-              className="text-2xl sm:text-3xl md:text-4xl font-bold dark:text-white text-neutral-900"
-            >
+            <h2 id="summer-programs-heading" className="text-2xl sm:text-3xl md:text-4xl font-bold dark:text-white text-neutral-900">
               Register for our Summer Programs
             </h2>
           </div>

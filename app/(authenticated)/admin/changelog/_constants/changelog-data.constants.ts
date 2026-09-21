@@ -2,6 +2,40 @@ import { ChangelogEntry, ChangeType, ImpactLevel } from '../_types/changelog.typ
 
 export const changelogData: ChangelogEntry[] = [
   {
+    version: '1.28.0',
+    date: '2026-09-21',
+    changes: [
+      {
+        type: 'feature',
+        title: 'Programs can have several photos',
+        description:
+          'Each program can now hold its own set of photos instead of one. Upload several at once in the program editor, star the one you want as the main photo, and remove any with the X. The starred photo is the one shown on the home page card and beside the program details.',
+        impact: 'high'
+      },
+      {
+        type: 'feature',
+        title: 'Photo gallery on program pages',
+        description:
+          'The rest of a program’s photos now appear below its details. Up to eight show in a grid; more than that become a row you can scroll sideways. Click any photo to see it full size and move between them with the arrows, the keyboard, or a swipe on a phone.',
+        impact: 'medium'
+      },
+      {
+        type: 'fix',
+        title: 'Program page colors stay consistent',
+        description:
+          'The banner color on a program page was picked at random, so the page could briefly load with one color and switch to another. Each program now keeps the same color every time it is viewed.',
+        impact: 'low'
+      },
+      {
+        type: 'improvement',
+        title: 'Old program links redirect permanently',
+        description:
+          'Links using the old program address format now tell search engines the page has moved for good, so search results update to the current address.',
+        impact: 'low'
+      }
+    ]
+  },
+  {
     version: '1.27.0',
     date: '2026-09-10',
     changes: [
@@ -15,8 +49,7 @@ export const changelogData: ChangelogEntry[] = [
       {
         type: 'fix',
         title: 'Card fields size correctly on phones',
-        description:
-          'A missing setting meant the card entry fields at checkout could render at the wrong size on a phone. Fixed.',
+        description: 'A missing setting meant the card entry fields at checkout could render at the wrong size on a phone. Fixed.',
         impact: 'medium'
       },
       {
@@ -1108,8 +1141,7 @@ export const changelogData: ChangelogEntry[] = [
       {
         type: 'feature',
         title: 'Partners Page',
-        description:
-          'New public-facing partners page with featured spotlight section, uniform partner grid, and a become-a-partner CTA.',
+        description: 'New public-facing partners page with featured spotlight section, uniform partner grid, and a become-a-partner CTA.',
         impact: 'high'
       },
       {
@@ -1525,8 +1557,7 @@ export const changelogData: ChangelogEntry[] = [
       {
         type: 'ui',
         title: 'Social Media Integration',
-        description:
-          'Added Facebook, Instagram, and YouTube social media icons to the footer with hover effects and dark mode support',
+        description: 'Added Facebook, Instagram, and YouTube social media icons to the footer with hover effects and dark mode support',
         impact: 'low'
       }
     ]
@@ -2155,8 +2186,7 @@ export const changelogData: ChangelogEntry[] = [
       {
         type: 'bug',
         title: 'Campaign Data Cleanup',
-        description:
-          'Fixed campaign pre-selection issue by cleaning up trailing whitespace in campaign names directly in the database.',
+        description: 'Fixed campaign pre-selection issue by cleaning up trailing whitespace in campaign names directly in the database.',
         impact: 'low'
       },
       {

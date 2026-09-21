@@ -7,12 +7,12 @@ export const getThemes = async () => {
       orderBy: { order: 'desc' }
     })
 
-    return themes
+    return { success: true, data: themes }
   } catch (error) {
     await createLog('error', 'Failed to fetch themes', {
       error: error instanceof Error ? error.message : 'Unknown error'
     })
 
-    return error
+    return { success: false, data: null, error: 'Could not load themes' }
   }
 }

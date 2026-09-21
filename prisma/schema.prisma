@@ -442,8 +442,6 @@ model Program {
   id                String  @id @default(cuid())
   name              String
   descriptions      Json    @default("[]")
-  image             String?
-  imageTwo          String?
   ageGroup          String? // e.g., "5-10"
   showAgeGroup      Boolean @default(false)
   location          String? // e.g., "Boys & Girls Club of Lynn"
@@ -463,16 +461,28 @@ model Program {
   pdfLink           String?
   pdfDescription    String?
 
+  image  String?
+  images ProgramImage[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Deprecated
-  description1 String?
-  description2 String?
-  description3 String?
-  description4 String?
-  description5 String?
-  heroImage    String?
+  // DEPRECARED
+  imageTwo String?
+}
+
+model ProgramImage {
+  id        String   @id @default(cuid())
+  url       String
+  isPrimary Boolean  @default(false)
+  order     Int      @default(0)
+  alt       String?
+  createdAt DateTime @default(now())
+
+  programId String
+  program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@index([programId, order])
 }
 
 model TeamMember {

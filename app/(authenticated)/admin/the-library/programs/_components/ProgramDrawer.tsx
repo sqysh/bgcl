@@ -41,8 +41,7 @@ export default function ProgramDrawer({ themes }: { themes: Theme[] }) {
     reset({
       name: program.name,
       descriptions: program.descriptions ?? [],
-      image: program.image ?? '',
-      imageTwo: program.imageTwo ?? '',
+      images: program.images ?? [],
       ageGroup: program.ageGroup ?? '',
       showAgeGroup: program.showAgeGroup,
       location: program.location ?? '',

@@ -20,15 +20,27 @@ export const programThemeSchema = z.object({
 
 export type ProgramTheme = z.infer<typeof programThemeSchema>
 
+// A ProgramImage row as the form holds it. New uploads have no id until the
+// program is saved, which is how the sync tells new images from existing ones.
+export const programImageSchema = z.object({
+  id: z.string().optional(),
+  url: z.string().trim().min(1),
+  isPrimary: z.boolean().default(false),
+  order: z.number().int().default(0),
+  alt: z.string().trim().nullish()
+})
+
+export type ProgramImage = z.infer<typeof programImageSchema>
+
 // ── Program ───────────────────────────────────────────────────────────────────
 
 export const programSchema = z.object({
   name: z.string().trim().min(1, { error: 'Please enter a program name' }),
   descriptions: z.array(z.string()).default([]),
 
-  // Media
-  image: z.string().trim().nullish(),
-  imageTwo: z.string().trim().nullish(),
+  // Media. The primary is flagged on the image itself; Program.image is written
+  // from it on save rather than being edited directly.
+  images: z.array(programImageSchema).default([]),
 
   // Age group
   ageGroup: z.string().trim().nullish(),
@@ -65,8 +77,7 @@ export const EMPTY_PROGRAM: ProgramFormInput = {
   name: '',
   descriptions: [],
 
-  image: '',
-  imageTwo: '',
+  images: [],
 
   ageGroup: '',
   showAgeGroup: false,
@@ -92,8 +103,6 @@ export const EMPTY_PROGRAM: ProgramFormInput = {
 }
 
 export const PROGRAM_NULLABLE_FIELDS = [
-  'image',
-  'imageTwo',
   'ageGroup',
   'location',
   'frequency',

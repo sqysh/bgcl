@@ -5,7 +5,7 @@ import { getThemes } from '@/lib/actions/theme/getThemes'
 
 export const metadata = { title: 'Programs - Admin' }
 
-export default async function ProgramsPage() {
+export default async function AdminProgramsPage() {
   const [result, themes] = await Promise.all([getPrograms(), getThemes()])
 
   return (

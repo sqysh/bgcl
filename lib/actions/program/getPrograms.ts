@@ -6,7 +6,8 @@ export async function getPrograms(isListed?: boolean) {
   try {
     const programs = await prisma.program.findMany({
       where: isListed !== undefined ? { isListed } : undefined,
-      orderBy: { order: 'asc' }
+      orderBy: { order: 'asc' },
+      include: { images: { orderBy: { order: 'asc' } } }
     })
 
     const formattedPrograms = programs.map((program) => ({
