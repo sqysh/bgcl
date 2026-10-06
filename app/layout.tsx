@@ -8,6 +8,7 @@ import { lexend, pinyon } from '@/lib/fonts'
 import { JsonLd } from '@/lib/scripts/JsonLd'
 import { ThemeProvider } from '@/lib/providers/theme.provider'
 import { Viewport } from 'next'
+import { Analytics } from '@vercel/analytics/next'
 
 export const metadata = siteMetadata
 
@@ -34,6 +35,7 @@ export default async function RootLayout({
         <SessionProvider>
           <ThemeProvider>{children}</ThemeProvider>
         </SessionProvider>
+        <Analytics />
       </body>
     </html>
   )
