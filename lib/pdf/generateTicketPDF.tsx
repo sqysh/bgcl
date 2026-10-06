@@ -1,5 +1,7 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { formatDate } from '../utils/date-utils'
+import { formatTime } from '../utils/time-utils'
 
 declare module 'jspdf' {
   interface jsPDF {
@@ -54,29 +56,10 @@ const LIGHT_GRAY = [243, 244, 246] as [number, number, number]
 const MID_GRAY = [107, 114, 128] as [number, number, number]
 const DARK_GRAY = [31, 41, 55] as [number, number, number]
 const BORDER = [209, 213, 219] as [number, number, number]
-const STUB_BG = [239, 246, 255] as [number, number, number]
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function formatDate(value: Date | string): string {
-  return new Date(value).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
-
-function formatTime(value: Date | string): string {
-  return new Date(value).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'America/New_York'
-  })
-}
 
 function padTicketNumber(n: number): string {
   return String(n).padStart(4, '0')
@@ -199,8 +182,7 @@ function drawTicket(doc: jsPDF, item: TicketItem, data: TicketPDFData, startY: n
   doc.rect(x, footerY, ticketW, footerH, 'F')
   doc.roundedRect(x, footerY + footerH - 3, ticketW, 3 + 0.5, 3, 3, 'F')
 
-  const terms =
-    data.event.raffleTerms ?? 'Must be present at time of draw to claim prize. Non-transferable. No cash value.'
+  const terms = data.event.raffleTerms ?? 'Must be present at time of draw to claim prize. Non-transferable. No cash value.'
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(5)
   doc.setTextColor(...MID_GRAY)
@@ -284,12 +266,9 @@ export function generateTicketPDF(data: TicketPDFData): void {
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     doc.setTextColor(...DARK_GRAY)
-    doc.text(
-      `${formatDate(data.event.raffleDrawDate)}  at  ${formatTime(data.event.raffleDrawDate)} EST`,
-      pageWidth / 2,
-      currentY + 14,
-      { align: 'center' }
-    )
+    doc.text(`${formatDate(data.event.raffleDrawDate)}  at  ${formatTime(data.event.raffleDrawDate, true)}`, pageWidth / 2, currentY + 14, {
+      align: 'center'
+    })
 
     currentY += 24
   }
@@ -305,9 +284,7 @@ export function generateTicketPDF(data: TicketPDFData): void {
     margin: { left: margin, right: margin },
     head: [['Ticket', 'Qty', 'Unit Price', 'Total']],
     body: data.items.map((item) => [
-      item.raffleTicketNumber
-        ? `${item.ticketName} (No. ${padTicketNumber(item.raffleTicketNumber)})`
-        : item.ticketName,
+      item.raffleTicketNumber ? `${item.ticketName} (No. ${padTicketNumber(item.raffleTicketNumber)})` : item.ticketName,
       item.quantity,
       `$${item.pricePerUnit.toFixed(2)}`,
       `$${item.totalPrice.toFixed(2)}`
@@ -342,12 +319,9 @@ export function generateTicketPDF(data: TicketPDFData): void {
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(6.5)
   doc.setTextColor(...MID_GRAY)
-  doc.text(
-    'Please bring this document to the event. Questions? Visit bgcl.org or email esousa@bgcl.org',
-    pageWidth / 2,
-    pageHeight - 8,
-    { align: 'center' }
-  )
+  doc.text('Please bring this document to the event. Questions? Visit bgcl.org or email esousa@bgcl.org', pageWidth / 2, pageHeight - 8, {
+    align: 'center'
+  })
 
   doc.setFont('helvetica', 'bold')
   doc.text(`Generated ${new Date().toLocaleDateString('en-US')}`, pageWidth - margin, pageHeight - 8, {

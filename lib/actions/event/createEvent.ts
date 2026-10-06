@@ -6,8 +6,7 @@ import { createLog } from '../log/createLog'
 import { eventSchema } from '@/lib/validations/event.validation'
 import { emptyToNull } from '@/lib/utils/emptyToNull'
 import { requireAdmin } from '@/lib/utils/requireAdmin'
-
-const toDate = (v: string | null | undefined) => (v ? new Date(v) : null)
+import { fromEventInput } from '@/lib/utils/eventTime'
 
 export async function createEvent(input: unknown) {
   const auth = await requireAdmin()
@@ -59,14 +58,14 @@ export async function createEvent(input: unknown) {
         order: (lastEvent?.order ?? -1) + 1,
 
         // Dates
-        date: new Date(v.date),
-        registrationDeadline: toDate(v.registrationDeadline) ?? new Date(),
-        rsvpDeadline: toDate(v.rsvpDeadline) ?? new Date(),
-        salesStartDate: toDate(v.salesStartDate),
-        salesEndDate: toDate(v.salesEndDate),
-        ticketSalesStartDate: toDate(v.ticketSalesStartDate),
-        ticketSalesEndDate: toDate(v.ticketSalesEndDate),
-        raffleDrawDate: toDate(v.raffleDrawDate),
+        date: fromEventInput(v.date)!,
+        registrationDeadline: fromEventInput(v.registrationDeadline),
+        rsvpDeadline: fromEventInput(v.rsvpDeadline),
+        salesStartDate: fromEventInput(v.salesStartDate),
+        salesEndDate: fromEventInput(v.salesEndDate),
+        ticketSalesStartDate: fromEventInput(v.ticketSalesStartDate),
+        ticketSalesEndDate: fromEventInput(v.ticketSalesEndDate),
+        raffleDrawDate: fromEventInput(v.raffleDrawDate),
         maxAttendees: v.maxAttendees || null
       }
     })

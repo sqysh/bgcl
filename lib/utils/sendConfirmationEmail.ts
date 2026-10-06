@@ -3,6 +3,7 @@ import recurringDonationTemplate from '../email-templates/recurring-donation'
 import { resend } from '@/lib/resend/resend'
 import { ticketPurchaseTemplate } from '../email-templates/ticket-purchase'
 import { createLog } from '../actions/log/createLog'
+import { EVENT_TIME_ZONE } from './eventTime'
 
 export default async function sendConfirmationEmail(
   order: any,
@@ -28,7 +29,8 @@ export default async function sendConfirmationEmail(
             weekday: 'long',
             month: 'long',
             day: 'numeric',
-            year: 'numeric'
+            year: 'numeric',
+            timeZone: EVENT_TIME_ZONE
           })
         : ''
 
@@ -37,7 +39,7 @@ export default async function sendConfirmationEmail(
             hour: 'numeric',
             minute: '2-digit',
             hour12: true,
-            timeZone: 'America/New_York'
+            timeZone: EVENT_TIME_ZONE
           })
         : ''
 

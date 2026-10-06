@@ -12,6 +12,7 @@ import { ConfirmationHero } from './_components/ConfirmationHero'
 import { TicketsGrid } from './_components/TicketsGrid'
 import { IOrder } from '@/types/entities/order'
 import { formatCurrency } from '@/lib/utils/currency.utils'
+import { formatTime } from '@/lib/utils/time-utils'
 
 export default function OrderConfirmationClient({ order }: { order: IOrder }) {
   const isDonation = Boolean(order?.type?.includes('DONATION'))
@@ -63,7 +64,7 @@ export default function OrderConfirmationClient({ order }: { order: IOrder }) {
             </div>
 
             <p className="text-sm text-neutral-500 dark:text-neutral-400 tabular-nums">
-              {formatDate(order?.paidAt || order?.createdAt, true)}
+              {formatTime(order?.paidAt || order?.createdAt, true)}
             </p>
           </motion.div>
 
@@ -74,12 +75,10 @@ export default function OrderConfirmationClient({ order }: { order: IOrder }) {
               transition={{ duration: 0.4, delay: 0.08 }}
               className="pt-4 border-t border-neutral-200 dark:border-neutral-800"
             >
-              <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-                What happens next
-              </p>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">What happens next</p>
               <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-                Your table is held. This deposit is credited toward the table price, and we will invoice the balance closer to the
-                event. Deposits are non-refundable.
+                Your table is held. This deposit is credited toward the table price, and we will invoice the balance closer to the event.
+                Deposits are non-refundable.
               </p>
             </motion.div>
           )}
@@ -199,9 +198,7 @@ export default function OrderConfirmationClient({ order }: { order: IOrder }) {
 
       <footer className="border-t border-neutral-200 dark:border-neutral-800 mt-auto">
         <div className="max-w-4xl mx-auto px-6 py-6 lg:px-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <p className="text-xs text-neutral-400 dark:text-neutral-600">
-            Boys &amp; Girls Club of Lynn · {new Date().getFullYear()}
-          </p>
+          <p className="text-xs text-neutral-400 dark:text-neutral-600">Boys &amp; Girls Club of Lynn · {new Date().getFullYear()}</p>
 
           <p className="text-xs text-neutral-400 dark:text-neutral-600">
             Secured by Stripe · Powered by{' '}

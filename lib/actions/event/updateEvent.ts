@@ -5,8 +5,7 @@ import { createLog } from '../log/createLog'
 import { revalidatePath } from 'next/cache'
 import { eventSchema } from '@/lib/validations/event.validation'
 import { requireAdmin } from '@/lib/utils/requireAdmin'
-
-const toDate = (v: string | null | undefined) => (v ? new Date(v) : null)
+import { fromEventInput } from '@/lib/utils/eventTime'
 
 export async function updateEvent(id: string, input: unknown) {
   const auth = await requireAdmin()
@@ -44,14 +43,14 @@ export async function updateEvent(id: string, input: unknown) {
       where: { id },
       data: {
         ...v,
-        date: new Date(v.date),
-        registrationDeadline: toDate(v.registrationDeadline) ?? existingEvent.registrationDeadline,
-        rsvpDeadline: toDate(v.rsvpDeadline) ?? existingEvent.rsvpDeadline,
-        salesStartDate: toDate(v.salesStartDate),
-        salesEndDate: toDate(v.salesEndDate),
-        ticketSalesStartDate: toDate(v.ticketSalesStartDate),
-        ticketSalesEndDate: toDate(v.ticketSalesEndDate),
-        raffleDrawDate: toDate(v.raffleDrawDate),
+        date: fromEventInput(v.date)!,
+        registrationDeadline: fromEventInput(v.registrationDeadline) ?? existingEvent.registrationDeadline,
+        rsvpDeadline: fromEventInput(v.rsvpDeadline) ?? existingEvent.rsvpDeadline,
+        salesStartDate: fromEventInput(v.salesStartDate),
+        salesEndDate: fromEventInput(v.salesEndDate),
+        ticketSalesStartDate: fromEventInput(v.ticketSalesStartDate),
+        ticketSalesEndDate: fromEventInput(v.ticketSalesEndDate),
+        raffleDrawDate: fromEventInput(v.raffleDrawDate),
         maxAttendees: v.maxAttendees || null,
         description: v.description || null,
         host: v.host || null,
